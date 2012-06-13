@@ -1,0 +1,25 @@
+{% extends "layout.html.jinja" %}
+{% from "helpers/link_to.html.jinja" import link_to %}
+{% from "helpers/file.html.jinja" import mono_file_summary %}
+
+{% block navigation_list %}
+{{ render_nav('debug') }}
+{% endblock navigation_list %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+  {{ render_all_flash() }}
+
+  <h2>application settings</h2>
+  <p>From config/default.py and other config files. Fixed; require server restart to change</p>
+  <pre>
+    {% for key, value in config|dictsort -%}
+      {{ key }} : {{ value }}
+    {% endfor -%}
+  </pre>
+
+</div>
+
+{% endblock content %}

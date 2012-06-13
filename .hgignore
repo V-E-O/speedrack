@@ -1,0 +1,22 @@
+syntax: glob
+
+sample.py
+sample.yml
+sample.yaml
+sample_sprack/
+logs/
+jobs/
+*shelve.db
+
+.gitignore
+.git
+*.elc
+*.pyc
+*.pyc$
+*.swp
+**/.git/**
+**/.svn/**
+*~
+.*~
+*\#
+*.DS_Store

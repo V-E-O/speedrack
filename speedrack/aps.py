@@ -213,7 +213,7 @@ def schedule_params(sched, params):
         much_later = date.fromordinal(date.max.toordinal())
         sched.add_date_job(executor_func, much_later, args=[params], jobstore=_FHANDLE)
     elif params.get("parsed_interval", None):
-        sched.add_interval_job(executor_func, args=[params], jobstore=_FHANDLE, **params["parsed_interval"])
+        sched.add_interval_job(executor_func, args=[params], jobstore=_FHANDLE, coalesce=True, **params["parsed_interval"])
     elif params.get("parsed_cron", None):
         sched.add_cron_job(executor_func, args=[params], jobstore=_FHANDLE, **params["parsed_cron"])
     else:

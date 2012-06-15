@@ -6,7 +6,7 @@ import sys, os
 sys.path.insert(0, os.path.join(sys.path.pop(0), ".."))
 
 import argparse
-#from gevent.wsgi import WSGIServer
+from gevent.wsgi import WSGIServer
 
 def _get_default_config():
     SPEEDRACK_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -96,10 +96,12 @@ settings: %s
 yaml: %s""" % (port, str(settings_file), str(yaml_file))
 
     speedrack.app.logger.info(msg)
-    speedrack.app.run(host="0.0.0.0", debug=debug, port=port)
+    if debug:
+        speedrack.app.run(host="0.0.0.0", debug=debug, port=port)
+    else:
+        http_server = WSGIServer(('', port), speedrack.app)
+        http_server.serve_forever()
     speedrack.app.logger.warn("STARTED")
-    #http_server = WSGIServer(('', port), speedrack.app)
-    #http_server.serve_forever()
 
 
 def main():

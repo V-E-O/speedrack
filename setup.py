@@ -12,6 +12,7 @@ tests_require = [
     'nose',
     'virtualenv>=1.7',
     'scripttest>=1.1.1',
+    'mock',
 ]
 
 install_requires = [

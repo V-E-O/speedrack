@@ -396,7 +396,7 @@ class Executor():
 
         summary = ""
         if filer.is_file(execution.std_err) and filer.get_size(execution.std_err) > 0:
-            summary = "stdout:\n" + filer.get_file_summary(execution.std_err, 2000, True)
+            summary = "stderr:\n" + filer.get_file_summary(execution.std_err, 2000, True)
         elif filer.is_file(execution.std_out) and filer.get_size(execution.std_out) > 0:
             summary = "stdout:\n" + filer.get_file_summary(execution.std_out, 2000, True)
 
@@ -544,7 +544,7 @@ class Execution():
     def success(self):
         if self._success is not None:
             return self._success
-        
+
         if self.has_std_err():
             app.logger.info("%s %s: std_err found" % (self.name, self.timestamp))
             self._success = False

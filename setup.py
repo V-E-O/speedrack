@@ -8,20 +8,17 @@ version = "0.1.d"
 with open('README.rst') as f:
     readme = f.read()
 
-with open('LICENSE.TXT') as f:
-    license = f.read()
-
 tests_require = [
     'nose',
     'virtualenv>=1.7',
     'scripttest>=1.1.1',
-    'mock',
 ]
 
 install_requires = [
     'APScheduler==2.0.3',
-    'flask==0.8',
+    'Flask==0.8',
     'PyYAML==3.10',
+    'gevent',
 ]
 
 data = dict(
@@ -43,6 +40,7 @@ data = dict(
         'console_scripts' : [ 'speedrack = speedrack.cmdline:main', ]
     },
     include_package_data = True,
+    zip_safe             = False,
     
     license          = 'BSD License',
     description      = 'yet another task runner, with web interface and execution history',

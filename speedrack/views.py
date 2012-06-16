@@ -126,6 +126,10 @@ def show_debug():
 def show_help():
     return render_template("help.html.jinja")
 
+@app.route("/holding")
+def show_holding():
+    return render_template("holding.html.jinja")
+
 @app.before_request
 def before_request():
     if HIDE_INACTIVE_TASKS in session and session[HIDE_INACTIVE_TASKS]:
@@ -135,6 +139,7 @@ def before_request():
 
     if app._shutdown:
         flash("System is shutting down or restarting, stop clicking buttons.", "warning")
+        redirect(url_for('show_holding'))
         g.shutdown = True
     else:
         g.shutdown = False

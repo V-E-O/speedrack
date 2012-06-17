@@ -33,7 +33,7 @@ def config_paths():
 
     if not app.config.get("SPEEDRACK_DIR", None):
         warning_msg = """!!!!!\n"NOTE: using temp directory, please set SPEEDRACK_DIR in settings\n!!!!!\n"""
-        sys.stderr.write(warning_msg)
+        sys.stdout.write(warning_msg)
 
         import tempfile
         default_temp_dir = tempfile.gettempdir()

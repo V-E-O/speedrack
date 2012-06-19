@@ -20,11 +20,13 @@ tasks:
   description: serves the role of an interval task that fails via status code
   command: sleep 1 && false
   interval: 62s
+  max_keep: 50
 
 - name: interval failer stderr
   description: serves the role of an interval task that fails via stderr
   command: python -c "import random, string; print ''.join(random.choice(string.ascii_uppercase) for x in range(random.randrange(60)))" 1>&2
   interval: 63s
+  max_keep: 50
 
 - name: interval later success
   description: serves the role of an interval task that hasn't been run yet
@@ -41,27 +43,32 @@ tasks:
   description: generates around 10k to stdout and 50k to stderr
   command: python -c "import random, string, sys; print >> sys.stderr, ''.join(random.choice(string.ascii_uppercase) for x in range(random.randrange(48000, 52000))); print ''.join(random.choice(string.ascii_uppercase) for x in range(random.randrange(8000, 12000)))"
   interval: 30m
+  max_keep: 20
 
 - name: timing conf error
   description: serves the role of a task with both interval and cron
   command: sleep 1 && false
   interval: 64s
   cron: { 'second': 5 }
+  max_keep: 50
 
 - name: cron winner
   description: serves the role of a cron task that succeeds
   command: python -c "import random, string; print ''.join(random.choice(string.ascii_uppercase) for x in range(random.randrange(60)))"
   cron: { 'second': 20 }
+  max_keep: 20
 
 - name: cron failer status code
   description: serves the role of a cron task that fails via status code
   command: sleep 1 && false
   cron: { 'second': 21 }
+  max_keep: 20
 
 - name: cron conf error
   description: serves the role of a cron task that has superfluous keywords
   command: sleep 1 && false
   cron: { 'second': 15, 'minutes': 30 }
+  max_keep: 50
 
 - name: failing huge spamming interval
   description: serves the role of a task that's Run Now and fails
@@ -69,3 +76,4 @@ tasks:
   interval: 400w
   email: chowarth@broadinstitute.org
   spam: oh hell yes
+  max_keep: 50

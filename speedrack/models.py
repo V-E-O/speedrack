@@ -301,6 +301,7 @@ class Executor():
             'parsed_cron'     : self.parsed_cron,
             'parsed_interval' : self.parsed_interval,
             'spam'            : self.spam,
+            'max_keep'        : self.max_keep,
             'fail_by_stderr'  : self.fail_by_stderr,
             'fail_on_retcode' : self.fail_on_retcode,
         }
@@ -389,7 +390,6 @@ class Executor():
             to_addresses.extend(self.email_recipients)
 
         from_address = app.config.get("EMAIL_FROM_ADDRESS")
-
         smtp_server = app.config.get("EMAIL_SMTP")
 
         if not from_address:

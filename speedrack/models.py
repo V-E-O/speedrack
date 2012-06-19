@@ -6,9 +6,12 @@ from speedrack import status
 from datetime import datetime
 from decorators import memoize
 
-import json
 from operator import attrgetter
 import os
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import subprocess
 import traceback
 import yaml
@@ -441,17 +444,15 @@ def is_execution_success(execution,
                          default_fail_by_retcode):
     # failing by retcode means either not finding a retcode OR finding
     # a retcode other than 0
-    fail_by_stderr = None
-    fail_by_retcode = None
+    fail_by_stderr = default_fail_by_stderr
+    fail_by_retcode = default_fail_by_retcode
 
     # a task's individual settings override application settings
     if execution.has_params():
         params_read = execution.get_op_params()
-        fail_by_stderr = params_read.get('fail_by_stderr', default_fail_by_stderr)
-        fail_by_retcode = params_read.get('fail_by_retcode', default_fail_by_retcode)
-    else:
-        fail_by_stderr = default_fail_by_stderr
-        fail_by_retcode = default_fail_by_retcode
+        if params_read:
+            fail_by_stderr = params_read.get('fail_by_stderr', fail_by_stderr)
+            fail_by_retcode = params_read.get('fail_by_retcode', fail_by_retcode)
 
     if fail_by_stderr and execution.has_std_err():
         app.logger.debug("%s %s: std_err found" % (execution.name, execution.timestamp))
@@ -587,7 +588,17 @@ class Execution():
 
         with open(self.op_params) as fin:
             params_read = fin.read()
-        return params_read
+
+        if not params_read:
+            return None
+
+        app.logger.error(params_read)
+        try:
+            params = json.loads(params_read)
+        except:
+            app.logger.error("Found something unexpected in params:\n{0}".format(params_read))
+            return None
+        return params
 
     @memoize
     def success(self):

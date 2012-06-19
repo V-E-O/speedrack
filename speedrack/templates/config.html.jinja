@@ -31,7 +31,7 @@
   {% if display_data == "raw" %}
   <p><code>{{ config['CONFIG_YAML'] }}</code></p>
   <pre class="prettyprint lang-yaml">
-{{ filer.get_file_summary(config['CONFIG_YAML'], 100000) }}
+{{ filer.get_file_summary(config['CONFIG_YAML'], max_size = none) }}
   </pre>
   {% elif display_data == "parsed" %}
   <pre class="prettyprint lang-python">

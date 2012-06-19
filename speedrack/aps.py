@@ -129,15 +129,18 @@ def run_task(sched, task_name):
 def executor_func(params):
     '''Unpack parameters, construct Executor object, run function.'''
 
+    # required
     name             = params['name']
     command          = params['command']
     config           = params['config']
     parsed_interval  = params['parsed_interval']
     parsed_cron      = params['parsed_cron']
+
+    # optional
     email_recipients = params.get('email_recipients', [])
     spam             = params.get('spam', None)
     description      = params.get('description', None)
-    max_keep         = params.get('max_keep)', None)
+    max_keep         = params.get('max_keep', None)
 
     ex = models.Executor(name, command)
     ex.config = config

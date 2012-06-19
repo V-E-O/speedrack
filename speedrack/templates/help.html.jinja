@@ -40,14 +40,15 @@
   <h3>Scheduling by cron</h3>
   <p>See APScheduler's documentation for <a class="reference external" href="http://readthedocs.org/docs/apscheduler/en/latest/modules/scheduler.html#apscheduler.scheduler.Scheduler.add_cron_job">add_cron_job</a>. In summary:</p>
   <pre class="literal-block">
-    year - year to run on
-    month - month to run on
-    day - day of month to run on
-    week - week of the year to run on
-    day_of_week - weekday to run on (0 = Monday)
-    hour - hour to run on
-    second - second to run on
+    year - 4-digit year to run on
+    month - month to run on (1-12)
+    day - day of month to run on (1-31)
+    week - week of the year to run on (1-53)
+    day_of_week - weekday to run on (0-6, 0 = Monday; or "mon","tue",...)
+    hour - hour to run on (0-23)
+    second - second to run on (0-59)
   </pre>
+  <p>(There are also fancier <a href="http://packages.python.org/APScheduler/cronschedule.html#expression-types">expression types</a> available.)</p>
   <p>Examples:</p>
   <ul class="simple">
     <li><tt class="docutils literal">{ &quot;day_of_week&quot;: 2, &quot;hour&quot;: 23 }</tt>: Tuesdays at 23:00</li>

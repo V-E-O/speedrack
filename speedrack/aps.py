@@ -172,6 +172,8 @@ def new_params(config_block):
     description = config_block.get('description', None)
     max_keep = config_block.get('max_keep', None)
     command = config_block.get('command', None)
+    fail_by_retcode = config_block.get('fail_by_retcode', None)
+    fail_by_stderr = config_block.get('fail_by_stderr', None)
 
     email_recipients = config_block.get('email', None)
     if email_recipients:
@@ -193,6 +195,8 @@ def new_params(config_block):
         'email_recipients': email_recipients,
         'parsed_cron': parsed_cron,
         'parsed_interval': parsed_interval,
+        'fail_by_stderr': fail_by_stderr,
+        'fail_by_retcode': fail_by_retcode,
         'config': config_block,
     }
 

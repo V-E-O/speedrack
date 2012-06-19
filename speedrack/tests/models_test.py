@@ -1,6 +1,8 @@
 import os.path
 
 from nose.tools import *
+from contextlib import nested
+from mock import patch
 
 from speedrack import models
 
@@ -117,59 +119,244 @@ class TestExecution(object):
         assert_true(self.e.has_status_code())
 
 
-class TestNeedsNotification(object):
+class TestIsExecutionSuccess(object):
 
-    def check_needs_notification(self, expected, args):
-        assert_equal(expected,
-                     models.needs_notification(*args))
+    def setup(self):
+        # placeholder object
+        dpath = os.path.join(TESTDATA_PATH, SAMPLE_TASK, EXECUTIONS_GOOD[0])
+        self.e = models.Execution(dpath)
+
+    def test_no_params_with_stderr(self):
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=True),
+            patch.object(self.e, 'has_params', return_value=None)):
+
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = True, default_fail_by_retcode = False))
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    def test_no_params_no_stderr(self):
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=False),
+            patch.object(self.e, 'has_params', return_value=None)):
+
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = True, default_fail_by_retcode = False))
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    def test_no_params_with_retcode(self):
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=False),
+            patch.object(self.e, 'has_status_code', return_value=True),
+            patch.object(self.e, 'get_status_code', return_value=1),
+            patch.object(self.e, 'has_params', return_value=None)):
+
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = True, default_fail_by_retcode = False))
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    def test_no_params_no_retcode(self):
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=False),
+            patch.object(self.e, 'has_status_code', return_value=False),
+            patch.object(self.e, 'has_params', return_value=None)):
+
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = True))
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    #
+    # tests with parameters demonstrate that task params override
+    # application settings
+    #
+    def test_with_params_with_stderr(self):
+        params = {
+            'fail_by_stderr': True,
+            'fail_by_retcode': False,
+        }
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=True),
+            patch.object(self.e, 'has_status_code', return_value=False),
+            patch.object(self.e, 'has_params', return_value=True),
+            patch.object(self.e, 'get_op_params', return_value=params)):
+
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = True, default_fail_by_retcode = False))
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    def test_with_params_no_stderr(self):
+        params = {
+            'fail_by_stderr': True,
+            'fail_by_retcode': False,
+        }
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=False),
+            patch.object(self.e, 'has_status_code', return_value=True),
+            patch.object(self.e, 'has_params', return_value=True),
+            patch.object(self.e, 'get_op_params', return_value=params)):
+
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = True, default_fail_by_retcode = False))
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    def test_with_params_with_bad_retcode(self):
+        params = {
+            'fail_by_stderr': False,
+            'fail_by_retcode': True,
+        }
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=False),
+            patch.object(self.e, 'has_status_code', return_value=True),
+            patch.object(self.e, 'get_status_code', return_value=1),
+            patch.object(self.e, 'has_params', return_value=True),
+            patch.object(self.e, 'get_op_params', return_value=params)):
+
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = True))
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    def test_with_params_with_good_retcode(self):
+        params = {
+            'fail_by_stderr': False,
+            'fail_by_retcode': True,
+        }
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=False),
+            patch.object(self.e, 'has_status_code', return_value=True),
+            patch.object(self.e, 'get_status_code', return_value=0),
+            patch.object(self.e, 'has_params', return_value=True),
+            patch.object(self.e, 'get_op_params', return_value=params)):
+
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = True))
+            assert_true(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+    def test_with_params_no_retcode(self):
+        params = {
+            'fail_by_stderr': False,
+            'fail_by_retcode': True,
+        }
+        with nested(
+            patch.object(self.e, 'has_std_err', return_value=False),
+            patch.object(self.e, 'has_status_code', return_value=False),
+            patch.object(self.e, 'has_params', return_value=True),
+            patch.object(self.e, 'get_op_params', return_value=params)):
+
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = True))
+            assert_false(models.is_execution_success(
+                self.e, default_fail_by_stderr = False, default_fail_by_retcode = False))
+
+
+
+class TestNeedsNotification(object):
 
     def setup(self):
         e0_path = os.path.join(TESTDATA_PATH,
                                SAMPLE_TASK,
                                EXECUTIONS_GOOD[0])
         self.e0 = models.Execution(e0_path)
+        self.e1 = models.Execution(e0_path)
 
-        self.executions = []
-        for ne in NOTIFICATION_EXECUTIONS:
-            epath = os.path.join(TESTDATA_PATH, NOTIFICATION_TASK, ne)
-            e = models.Execution(epath)
-            self.executions.append(e)
-            
-    def test_initial_success_nospam(self):
-        self.check_needs_notification(False, [self.e0, False])
+    def test_initial_success_no_prev_no_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=True)):
 
-    def test_initial_success_spam(self):
-        self.check_needs_notification("success", [self.e0, True])
+            assert_false(
+                models.needs_notification(self.e0, prev_exec = None, spam = False))
 
-    def test_initial_failure_nospam(self):
-        self.check_needs_notification("failed", [self.executions[0], False])
+    def test_initial_success_no_prev_with_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=True)):
 
-    def test_initial_failure_spam(self):
-        self.check_needs_notification("failed", [self.executions[0], True])
+            assert_equal("success",
+                models.needs_notification(self.e0, prev_exec = None, spam = True))
 
-    def test_failure_after_failure_nospam(self):
-        self.check_needs_notification(False, [self.executions[1], False])
+    def test_initial_failure_no_prev_no_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False)):
 
-    def test_failure_after_failure_spam(self):
-        self.check_needs_notification("failed", [self.executions[1], True])
+            assert_equal("failed",
+                models.needs_notification(self.e0, prev_exec = None, spam = False))
 
-    def test_success_after_failure_nospam(self):
-        self.check_needs_notification("success", [self.executions[2], False])
+    def test_initial_failure_no_prev_with_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False)):
 
-    def test_success_after_failure_spam(self):
-        self.check_needs_notification("success", [self.executions[2], True])
+            assert_equal("failed",
+                models.needs_notification(self.e0, prev_exec = None, spam = True))
 
-    def test_success_after_success_nospam(self):
-        self.check_needs_notification(False, [self.executions[3], False])
+    def test_failure_after_failure_no_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False),
+            patch.object(self.e1, 'success', return_value=False)):
 
-    def test_success_after_success_spam(self):
-        self.check_needs_notification("success", [self.executions[3], True])
+            assert_false(
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
 
-    def test_failure_after_success_nospam(self):
-        self.check_needs_notification("failed", [self.executions[4], False])
+    def test_failure_after_failure_with_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False),
+            patch.object(self.e1, 'success', return_value=False)):
 
-    def test_failure_after_success_spam(self):
-        self.check_needs_notification("failed", [self.executions[4], True])
+            assert_equal("failed",
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
+
+    def test_success_after_failure_no_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=True),
+            patch.object(self.e1, 'success', return_value=False)):
+
+            assert_equal("success",
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
+
+    def test_success_after_failure_with_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=True),
+            patch.object(self.e1, 'success', return_value=False)):
+
+            assert_equal("success",
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
+
+    def test_success_after_success_no_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=True),
+            patch.object(self.e1, 'success', return_value=True)):
+
+            assert_false(
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
+
+    def test_success_after_success_with_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=True),
+            patch.object(self.e1, 'success', return_value=True)):
+
+            assert_equal("success",
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
+
+    def test_failure_after_success_no_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False),
+            patch.object(self.e1, 'success', return_value=True)):
+
+            assert_equal("failed",
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
+
+    def test_failure_after_success_with_spam(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False),
+            patch.object(self.e1, 'success', return_value=True)):
+
+            assert_equal("failed",
+                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
 
 
 class TestIsConfError(object):

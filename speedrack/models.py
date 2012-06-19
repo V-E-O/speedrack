@@ -111,9 +111,7 @@ def is_conf_error(params):
 # if spam, just answer with success/fail
 # returns string with message if notification
 # is needed, otherwise False
-def needs_notification(execution, spam = None):
-    _task = Task(execution.name, job_root_dir = execution.task_root)
-    prev_exec = _task.find_previous_execution(execution.timestamp)
+def needs_notification(execution, prev_exec = None, spam = None):
 
     if (not execution.success()
         and (spam or not prev_exec or prev_exec.success())):
@@ -133,6 +131,8 @@ class Task():
                  max_keep = None,
                  description = None,
                  count = None,
+                 fail_by_stderr = None,
+                 fail_on_retcode = None,
                  job_root_dir = None):
 
         if not job_root_dir:
@@ -144,8 +144,10 @@ class Task():
         self.name = name
         self.max_keep = max_keep
         self.description = description
+        self.fail_by_stderr = fail_by_stderr
+        self.fail_on_retcode = fail_on_retcode
+
         self.conf_error = None
-        
         self.running = False
         self.active = False
 
@@ -280,6 +282,8 @@ class Executor():
         self.parsed_cron = None
         self.parsed_interval = None
         self.spam = None
+        self.fail_by_stderr = None
+        self.fail_on_retcode = None
 
         if not job_root_dir:
             self.job_root_dir = app.config.get('JOB_ROOT_DIR', None)
@@ -293,6 +297,9 @@ class Executor():
             'command'         : self.command,
             'parsed_cron'     : self.parsed_cron,
             'parsed_interval' : self.parsed_interval,
+            'spam'            : self.spam,
+            'fail_by_stderr'  : self.fail_by_stderr,
+            'fail_on_retcode' : self.fail_on_retcode,
         }
         
     @memoize
@@ -319,7 +326,9 @@ class Executor():
         return this_run
 
     def needs_notification(self, execution):
-        return needs_notification(execution, self.spam)
+        _task = Task(execution.name, job_root_dir = execution.task_root)
+        prev_exec = _task.find_previous_execution(execution.timestamp)
+        return needs_notification(execution, prev_exec, self.spam)
 
     def run(self):
         '''execute task, ping notifiers, clean up old tasks'''
@@ -426,6 +435,37 @@ class Executor():
 
     def __call__(self):
         self.run()
+
+def is_execution_success(execution,
+                         default_fail_by_stderr,
+                         default_fail_by_retcode):
+    # failing by retcode means either not finding a retcode OR finding
+    # a retcode other than 0
+    fail_by_stderr = None
+    fail_by_retcode = None
+
+    # a task's individual settings override application settings
+    if execution.has_params():
+        params_read = execution.get_op_params()
+        fail_by_stderr = params_read.get('fail_by_stderr', default_fail_by_stderr)
+        fail_by_retcode = params_read.get('fail_by_retcode', default_fail_by_retcode)
+    else:
+        fail_by_stderr = default_fail_by_stderr
+        fail_by_retcode = default_fail_by_retcode
+
+    if fail_by_stderr and execution.has_std_err():
+        app.logger.debug("%s %s: std_err found" % (execution.name, execution.timestamp))
+        return False
+
+    if fail_by_retcode and not execution.has_status_code():
+        app.logger.debug("%s %s: no status code" % (execution.name, execution.timestamp))
+        return False
+
+    if fail_by_retcode and execution.get_status_code() != 0:
+        app.logger.debug("%s %s: status code: %d" % (execution.name, execution.timestamp, execution.get_status_code()))
+        return False
+
+    return True
 
 class Execution():
     ''' The working directory and results of one task. '''
@@ -541,23 +581,19 @@ class Execution():
         return self.std_out
 
     @memoize
+    def get_op_params(self):
+        if not self.has_params():
+            return None
+
+        with open(self.op_params) as fin:
+            params_read = fin.read()
+        return params_read
+
+    @memoize
     def success(self):
-        if self._success is not None:
-            return self._success
-
-        if self.has_std_err():
-            app.logger.info("%s %s: std_err found" % (self.name, self.timestamp))
-            self._success = False
-        elif not self.has_status_code():
-            app.logger.info("%s %s: no status code" % (self.name, self.timestamp))
-            self._success = False
-        elif self.get_status_code() != 0:
-            app.logger.info("%s %s: status code: %d" % (self.name, self.timestamp, self.get_status_code()))
-            self._success = False
-        else:
-            self._success = True
-
-        return self._success
+        return is_execution_success(self,
+            default_fail_by_stderr = app.config.get('FAIL_BY_STDERR'),
+            default_fail_by_retcode = app.config.get('FAIL_BY_RETCODE'))
 
     def __str__(self):
         msg = "Execution:%s" % (self.job_dir)

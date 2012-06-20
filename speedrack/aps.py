@@ -15,14 +15,13 @@ from speedrack import models
 from speedrack import timing
 from speedrack.constants import task_params
 
-logger = app.logger
-
 # The handle of 'default' is necessary, or a default RAMStore is created
 # which is pretty confusing
 _FHANDLE = 'file'
 
 # connect apscheduler's logger to application's
-apscheduler.scheduler.logger = logger
+apscheduler.scheduler.logger = app.logger
+logger = app.logger # expose without referring to app
 
 def init(yaml_file, job_state_file = None):
     """Set up apscheduler, recover existing file store if there is one,

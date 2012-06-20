@@ -47,7 +47,7 @@ MAX_RUNS = False
 #LOG_DIR = "./logs"
 
 # log
-MAX_LOG_SIZE = 1024 * 1024
+LOG_MAX_SIZE = 1024 * 1024
 LOG_COUNT = 5
 
 #

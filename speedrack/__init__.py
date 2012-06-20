@@ -52,11 +52,13 @@ def config_paths():
     set_default_path(con.JOB_ROOT_DIR, "jobs")
     set_default_path(con.JOB_STATE, "speedrack.state")
 
+
 def start_logger():
 
     app.debug_log_format = """%(levelname)s in %(module)s [%(pathname)s:%(lineno)d]:\n%(message)s"""
 
     if not app.debug and app.config.get(con.LOG_DIR, None):
+
         # setup local log dir
         if not os.path.exists(app.config[con.LOG_DIR]):
             os.makedirs(app.config[con.LOG_DIR])
@@ -65,8 +67,9 @@ def start_logger():
         from logging.handlers import RotatingFileHandler
         app.logger.setLevel(logging.DEBUG)
 
-        handler = RotatingFileHandler("%(LOG_DIR)s/speedrack.log" % app.config,
-                                      maxBytes=app.config[con.MAX_LOG_SIZE],
+        speedrack_log_file = os.path.join(app.config[con.LOG_DIR], "speedrack.log")
+        handler = RotatingFileHandler(speedrack_log_file,
+                                      maxBytes=app.config[con.LOG_MAX_SIZE],
                                       backupCount=app.config[con.LOG_COUNT])
         handler.setLevel(logging.INFO)
         lines = {
@@ -79,6 +82,10 @@ def start_logger():
         handler.setFormatter(formatter)
 
         app.logger.addHandler(handler)
+
+    else:
+        sys.stdout.write("NO LOG. Either in debug mode or {0} not configured.\n".format(con.LOG_DIR))
+
 
 def launch_services():
     '''after settings have been loaded, start processes.'''

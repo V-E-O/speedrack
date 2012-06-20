@@ -5,6 +5,7 @@ release = version + ''.join(str(n) for n in version_info[3:])
 from flask import Flask
 import os, sys
 import filer
+import constants as con
 
 app = Flask(__name__)
 # needed to make state saving work
@@ -31,42 +32,42 @@ signal.signal(signal.SIGINT, sigint_handler)
 def config_paths():
     '''Based on assigned settings, compute log, state, and job paths'''
 
-    if not app.config.get("SPEEDRACK_DIR", None):
+    if not app.config.get(con.SPEEDRACK_DIR, None):
         warning_msg = """!!!!!\n"NOTE: using temp directory, please set SPEEDRACK_DIR in settings\n!!!!!\n"""
         sys.stdout.write(warning_msg)
 
         import tempfile
         default_temp_dir = tempfile.gettempdir()
-        speedrack_instance_name = app.config.get("APP_NAME", "speedrack")
+        speedrack_instance_name = app.config.get(con.APP_NAME, "speedrack")
         default_speedrack_dir = os.path.join(default_temp_dir, speedrack_instance_name)
-        app.config['SPEEDRACK_DIR'] = default_speedrack_dir
+        app.config[con.SPEEDRACK_DIR] = default_speedrack_dir
 
     def set_default_path(config_key, key_path):
-        if not app.config.get(config_key) and app.config.get('SPEEDRACK_DIR'):
-            key_dir = os.path.join(app.config.get('SPEEDRACK_DIR'), key_path)
+        if not app.config.get(config_key) and app.config.get(con.SPEEDRACK_DIR):
+            key_dir = os.path.join(app.config.get(con.SPEEDRACK_DIR), key_path)
             app.config[config_key] = key_dir
             print "setting {0} to {1}".format(config_key, key_dir)
 
-    set_default_path("LOG_DIR", "logs")
-    set_default_path("JOB_ROOT_DIR", "jobs")
-    set_default_path("JOB_STATE", "speedrack.state")
+    set_default_path(con.LOG_DIR, "logs")
+    set_default_path(con.JOB_ROOT_DIR, "jobs")
+    set_default_path(con.JOB_STATE, "speedrack.state")
 
 def start_logger():
 
     app.debug_log_format = """%(levelname)s in %(module)s [%(pathname)s:%(lineno)d]:\n%(message)s"""
 
-    if not app.debug and app.config.get('LOG_DIR', None):
+    if not app.debug and app.config.get(con.LOG_DIR, None):
         # setup local log dir
-        if not os.path.exists(app.config['LOG_DIR']):
-            os.makedirs(app.config['LOG_DIR'])
+        if not os.path.exists(app.config[con.LOG_DIR]):
+            os.makedirs(app.config[con.LOG_DIR])
 
         import logging
         from logging.handlers import RotatingFileHandler
         app.logger.setLevel(logging.DEBUG)
 
         handler = RotatingFileHandler("%(LOG_DIR)s/speedrack.log" % app.config,
-                                      maxBytes=app.config['MAX_LOG_SIZE'],
-                                      backupCount=app.config['LOG_COUNT'])
+                                      maxBytes=app.config[con.MAX_LOG_SIZE],
+                                      backupCount=app.config[con.LOG_COUNT])
         handler.setLevel(logging.INFO)
         lines = {
             'first': " ".join(['%(asctime)-15s',
@@ -83,18 +84,18 @@ def launch_services():
     '''after settings have been loaded, start processes.'''
 
     # debug toolbar
-    if app.config['FLASK_DEBUG_TOOLBAR']:
+    if app.config[con.FLASK_DEBUG_TOOLBAR]:
         app.debug = True
-        app.config['SECRET_KEY'] = app.secret_key # looks in config rather than in global
+        app.config[con.SECRET_KEY] = app.secret_key # looks in config rather than in global
         app.config['DEBUG_TB_TEMPLATE_EDITOR_ENABLED'] = True
         from flask.ext.debugtoolbar import DebugToolbarExtension
         DebugToolbarExtension(app) # returns the toolbar; we don't need it
 
     start_logger()
     config_paths()
-    filer.assert_no_tilde(app.config['JOB_ROOT_DIR'])
-    if not os.path.exists(app.config['JOB_ROOT_DIR']):
-        os.makedirs(app.config['JOB_ROOT_DIR'])
+    filer.assert_no_tilde(app.config[con.JOB_ROOT_DIR])
+    if not os.path.exists(app.config[con.JOB_ROOT_DIR]):
+        os.makedirs(app.config[con.JOB_ROOT_DIR])
     start_scheduler()
 
 def _set_settings_file(settings_file):
@@ -113,7 +114,7 @@ set_user_settings_file = set_default_settings_file
 
 def set_task_file(task_file):
     """overrides demo task file"""
-    app.config['CONFIG_YAML'] = task_file
+    app.config[con.CONFIG_YAML] = task_file
 
 import speedrack.context_processors
 import speedrack.filters
@@ -124,6 +125,6 @@ from speedrack import timing
 from speedrack import aps
 
 def start_scheduler():
-    app._sched = aps.init(app.config.get('CONFIG_YAML', None),
-                          app.config.get('JOB_STATE', None))
+    app._sched = aps.init(app.config.get(con.CONFIG_YAML, None),
+                          app.config.get(con.JOB_STATE, None))
     app.logger.info("Speedrack started in '%s' environment." % ("test"))

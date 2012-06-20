@@ -22,8 +22,12 @@ FSIZE_MAX     = 10000 # bytes
 # If the file is too big to show, show this much
 FSIZE_SUMMARY = 5000  # bytes
 
+#
+# Global error defaults
+#
+
 # Nonzero status code is failure
-FAIL_BY_NONZERO_STATUS_CODE = True
+FAIL_BY_RETCODE = True
 # Generating stderr is failure
 FAIL_BY_STDERR = True
 

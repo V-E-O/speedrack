@@ -2,6 +2,8 @@ from speedrack import app
 from speedrack import filer
 from speedrack import notification
 from speedrack import status
+import constants as con
+import constants.task_params as task_params
 
 from datetime import datetime
 from decorators import memoize
@@ -30,7 +32,7 @@ class TaskList():
         self.sched = sched
         self.tasks = None
         if not job_root_dir:
-            self.job_root_dir = app.config.get('JOB_ROOT_DIR', None)
+            self.job_root_dir = app.config.get(con.JOB_ROOT_DIR, None)
         else:
             self.job_root_dir = job_root_dir
 
@@ -43,9 +45,9 @@ class TaskList():
             # little hairy -- this is where we set attach our
             # execution logic to our task structure
             params = job.args[0]
-            task = Task(params["name"],
-                        max_keep = params.get("max_keep", None),
-                        description = params.get("description", None))
+            task = Task(params[task_params.NAME],
+                        max_keep = params.get(task_params.MAX_KEEP, None),
+                        description = params.get(task_params.DESCRIPTION, None))
 
             task.conf_error = is_conf_error(params)
             task.running = job.instances != 0
@@ -85,7 +87,7 @@ class TaskList():
             active_tasks = self._tasks_from_sched()
             tasks.update(active_tasks)
             self.tasks = tasks.values()
-        self.tasks.sort(key=attrgetter('name'))
+        self.tasks.sort(key=attrgetter(task_params.NAME))
         return self.tasks
 
     def find_task(self, name):
@@ -96,10 +98,10 @@ class TaskList():
 
 
 def is_conf_error(params):
-    command         = params.get('command', None)
-    name            = params.get('name', None)
-    parsed_cron     = params.get('parsed_cron', None)
-    parsed_interval = params.get('parsed_interval', None)
+    command         = params.get(task_params.COMMAND, None)
+    name            = params.get(task_params.NAME, None)
+    parsed_cron     = params.get(task_params.PARSED_CRON, None)
+    parsed_interval = params.get(task_params.PARSED_INTERVAL, None)
 
     if (not name or
         not command or
@@ -110,6 +112,7 @@ def is_conf_error(params):
         return True
 
     return False
+
 
 # if spam, just answer with success/fail
 # returns string with message if notification
@@ -135,11 +138,11 @@ class Task():
                  description = None,
                  count = None,
                  fail_by_stderr = None,
-                 fail_on_retcode = None,
+                 fail_by_retcode = None,
                  job_root_dir = None):
 
         if not job_root_dir:
-            self.job_root_dir = app.config.get('JOB_ROOT_DIR', None)
+            self.job_root_dir = app.config.get(con.JOB_ROOT_DIR, None)
         else:
             self.job_root_dir = job_root_dir
 
@@ -148,7 +151,7 @@ class Task():
         self.max_keep = max_keep
         self.description = description
         self.fail_by_stderr = fail_by_stderr
-        self.fail_on_retcode = fail_on_retcode
+        self.fail_by_retcode = fail_by_retcode
 
         self.conf_error = None
         self.running = False
@@ -286,27 +289,26 @@ class Executor():
         self.parsed_interval = None
         self.spam = None
         self.fail_by_stderr = None
-        self.fail_on_retcode = None
+        self.fail_by_retcode = None
 
         if not job_root_dir:
-            self.job_root_dir = app.config.get('JOB_ROOT_DIR', None)
+            self.job_root_dir = app.config.get(con.JOB_ROOT_DIR, None)
         else:
             self.job_root_dir = job_root_dir
 
     @memoize
     def get_op_params(self):
         return {
-            'name'            : self.name,
-            'command'         : self.command,
-            'parsed_cron'     : self.parsed_cron,
-            'parsed_interval' : self.parsed_interval,
-            'spam'            : self.spam,
-            'max_keep'        : self.max_keep,
-            'fail_by_stderr'  : self.fail_by_stderr,
-            'fail_on_retcode' : self.fail_on_retcode,
+            task_params.NAME            : self.name,
+            task_params.COMMAND         : self.command,
+            task_params.PARSED_CRON     : self.parsed_cron,
+            task_params.PARSED_INTERVAL : self.parsed_interval,
+            task_params.SPAM            : self.spam,
+            task_params.MAX_KEEP        : self.max_keep,
+            task_params.FAIL_BY_STDERR  : self.fail_by_stderr,
+            task_params.FAIL_BY_RETCODE : self.fail_by_retcode,
         }
         
-    @memoize
     def get_conf_error(self):
         return is_conf_error(self.get_op_params())
 
@@ -348,7 +350,7 @@ class Executor():
 
         # set as running; run; set as not running
         try:
-            execution.write_op_params(str(self.get_op_params()))
+            execution.write_op_params(json.dumps(self.get_op_params(), sort_keys=True, indent=2))
             execution.start_running()
             with open(execution.std_out, "w") as fout, \
                 open(execution.std_err, "w") as ferr:
@@ -364,7 +366,7 @@ class Executor():
 
         # email 'if needed'
         # TODO: this -> somewhere else?
-        if not app.config.get('EMAIL_DISABLED', None):
+        if not app.config.get(con.EMAIL_DISABLED, None):
             response = self.needs_notification(execution)
             if response:
                 self.send_email(execution, response)
@@ -384,13 +386,13 @@ class Executor():
     def send_email(self, execution, flag):
 
         to_addresses = []
-        global_addresses = app.config.get('EMAIL_TO_GLOBAL', [])
+        global_addresses = app.config.get(con.EMAIL_TO_GLOBAL, [])
         to_addresses.extend(global_addresses)
         if self.email_recipients:
             to_addresses.extend(self.email_recipients)
 
-        from_address = app.config.get("EMAIL_FROM_ADDRESS")
-        smtp_server = app.config.get("EMAIL_SMTP")
+        from_address = app.config.get(con.EMAIL_FROM_ADDRESS)
+        smtp_server = app.config.get(con.EMAIL_SMTP)
 
         if not from_address:
             app.logger.warn("No sender available for this failing task: {0}".format(execution.name))
@@ -413,13 +415,13 @@ class Executor():
             summary = "stdout:\n" + filer.get_file_summary(execution.std_out, 2000, True)
 
         task_link = None
-        if app.config.get('URL_ROOT', None):
+        if app.config.get(con.URL_ROOT, None):
             # not my favorite flaskism
             with app.test_request_context():
                 from flask import url_for
                 task_link_args = {
-                    'server': app.config.get('URL_ROOT', None),
-                    'port': app.config.get('PORT', None),
+                    'server': app.config.get(con.URL_ROOT, None),
+                    'port': app.config.get(con.PORT, None),
                     'route': url_for('show_tasks',
                                      task_name = execution.name,
                                      timestamp = execution.timestamp),
@@ -427,7 +429,7 @@ class Executor():
                 task_link = "http://{server}:{port}/{route}".format(**task_link_args)
 
         message = notification.create_mail(
-            app_name = app.config.get("APP_NAME", "Speedrack"),
+            app_name = app.config.get(con.APP_NAME, "Speedrack"),
             task_name = execution.name,
             task_status = flag,
             task_link = task_link,
@@ -438,6 +440,7 @@ class Executor():
 
     def __call__(self):
         self.run()
+
 
 def is_execution_success(execution,
                          default_fail_by_stderr,
@@ -451,8 +454,12 @@ def is_execution_success(execution,
     if execution.has_params():
         params_read = execution.get_op_params()
         if params_read:
-            fail_by_stderr = params_read.get('fail_by_stderr', fail_by_stderr)
-            fail_by_retcode = params_read.get('fail_by_retcode', fail_by_retcode)
+            if (task_params.FAIL_BY_STDERR in params_read
+                and params_read[task_params.FAIL_BY_STDERR] != None):
+                fail_by_stderr = params_read.get(task_params.FAIL_BY_STDERR, fail_by_stderr)
+            if (task_params.FAIL_BY_RETCODE in params_read
+                and params_read[task_params.FAIL_BY_RETCODE] != None):
+                fail_by_retcode = params_read.get(task_params.FAIL_BY_RETCODE, fail_by_retcode)
 
     if fail_by_stderr and execution.has_std_err():
         app.logger.debug("%s %s: std_err found" % (execution.name, execution.timestamp))
@@ -466,7 +473,11 @@ def is_execution_success(execution,
         app.logger.debug("%s %s: status code: %d" % (execution.name, execution.timestamp, execution.get_status_code()))
         return False
 
+    app.logger.debug("{0} {1}: fail_by_stderr {2}".format(execution.name, execution.timestamp, fail_by_stderr))
+    app.logger.debug("{0} {1}: fail_by_retcode {2}".format(execution.name, execution.timestamp, fail_by_retcode))
+    app.logger.debug("{0} {1}: status code: {2}".format(execution.name, execution.timestamp, execution.get_status_code()))
     return True
+
 
 class Execution():
     ''' The working directory and results of one task. '''
@@ -592,19 +603,20 @@ class Execution():
         if not params_read:
             return None
 
-        app.logger.error(params_read)
         try:
             params = json.loads(params_read)
-        except:
-            app.logger.error("Found something unexpected in params:\n{0}".format(params_read))
+        except Exception as inst:
+            msg = "Exception parsing {0} {1} params:\n{2}\n{3}\n{4}".format(
+                str(self.name), self.timestamp, params_read, inst, traceback.format_exc())
+            app.logger.error(msg)
             return None
         return params
 
     @memoize
     def success(self):
         return is_execution_success(self,
-            default_fail_by_stderr = app.config.get('FAIL_BY_STDERR'),
-            default_fail_by_retcode = app.config.get('FAIL_BY_RETCODE'))
+            default_fail_by_stderr = app.config.get(con.FAIL_BY_STDERR),
+            default_fail_by_retcode = app.config.get(con.FAIL_BY_RETCODE))
 
     def __str__(self):
         msg = "Execution:%s" % (self.job_dir)

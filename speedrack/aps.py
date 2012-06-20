@@ -13,6 +13,7 @@ from flask import flash
 from speedrack import app
 from speedrack import models
 from speedrack import timing
+from speedrack.constants import task_params
 
 logger = app.logger
 
@@ -101,7 +102,7 @@ def run_task(sched, task_name):
     params = None
     for job in jobs:
         params = job.args[0]
-        if params['name'] == task_name:
+        if params[task_params.NAME] == task_name:
             target_job = job
             break
 
@@ -130,17 +131,17 @@ def executor_func(params):
     '''Unpack parameters, construct Executor object, run function.'''
 
     # required
-    name             = params['name']
-    command          = params['command']
-    config           = params['config']
-    parsed_interval  = params['parsed_interval']
-    parsed_cron      = params['parsed_cron']
+    name             = params[task_params.NAME]
+    command          = params[task_params.COMMAND]
+    config           = params[task_params.CONFIG]
+    parsed_interval  = params[task_params.PARSED_INTERVAL]
+    parsed_cron      = params[task_params.PARSED_CRON]
 
     # optional
-    email_recipients = params.get('email_recipients', [])
-    spam             = params.get('spam', None)
-    description      = params.get('description', None)
-    max_keep         = params.get('max_keep', None)
+    email_recipients = params.get(task_params.EMAIL_RECIPIENTS, [])
+    spam             = params.get(task_params.SPAM, None)
+    description      = params.get(task_params.DESCRIPTION, None)
+    max_keep         = params.get(task_params.MAX_KEEP, None)
 
     ex = models.Executor(name, command)
     ex.config = config
@@ -170,37 +171,37 @@ def new_params(config_block):
 
     logger.debug("new params requested: %s" % str(config_block))
 
-    name = config_block.get('name', None)
+    name = config_block.get(task_params.NAME, None)
     name = understate(name)
-    description = config_block.get('description', None)
-    max_keep = config_block.get('max_keep', None)
-    command = config_block.get('command', None)
-    fail_by_retcode = config_block.get('fail_by_retcode', None)
-    fail_by_stderr = config_block.get('fail_by_stderr', None)
+    description = config_block.get(task_params.DESCRIPTION, None)
+    max_keep = config_block.get(task_params.MAX_KEEP, None)
+    command = config_block.get(task_params.COMMAND, None)
+    fail_by_retcode = config_block.get(task_params.FAIL_BY_RETCODE, None)
+    fail_by_stderr = config_block.get(task_params.FAIL_BY_STDERR, None)
 
-    email_recipients = config_block.get('email', None)
+    email_recipients = config_block.get(task_params.TASK_EMAIL, None)
     if email_recipients:
         email_recipients = ",".split(email_recipients)
     else:
         email_recipients = []
 
-    unparsed_interval = config_block.get('interval', None)
+    unparsed_interval = config_block.get(task_params.TASK_INTERVAL, None)
     parsed_interval = timing.parse_interval(unparsed_interval)
 
-    unparsed_cron = config_block.get('cron', None)
+    unparsed_cron = config_block.get(task_params.TASK_CRON, None)
     parsed_cron = timing.parse_cron(unparsed_cron)
 
     params = {
-        'name': name,
-        'description': description,
-        'max_keep': max_keep,
-        'command': command,
-        'email_recipients': email_recipients,
-        'parsed_cron': parsed_cron,
-        'parsed_interval': parsed_interval,
-        'fail_by_stderr': fail_by_stderr,
-        'fail_by_retcode': fail_by_retcode,
-        'config': config_block,
+        task_params.NAME: name,
+        task_params.DESCRIPTION: description,
+        task_params.MAX_KEEP: max_keep,
+        task_params.COMMAND: command,
+        task_params.EMAIL_RECIPIENTS: email_recipients,
+        task_params.PARSED_CRON: parsed_cron,
+        task_params.PARSED_INTERVAL: parsed_interval,
+        task_params.FAIL_BY_STDERR: fail_by_stderr,
+        task_params.FAIL_BY_RETCODE: fail_by_retcode,
+        task_params.CONFIG: config_block,
     }
 
     # In erroneous configurations, we add a dummy job with an
@@ -220,9 +221,9 @@ def schedule_params(sched, params):
         much_later = date.fromordinal(date.max.toordinal())
         sched.add_date_job(executor_func, much_later, args=[params], jobstore=_FHANDLE)
     elif params.get("parsed_interval", None):
-        sched.add_interval_job(executor_func, args=[params], jobstore=_FHANDLE, coalesce=True, **params["parsed_interval"])
+        sched.add_interval_job(executor_func, args=[params], jobstore=_FHANDLE, coalesce=True, **params[task_params.PARSED_INTERVAL])
     elif params.get("parsed_cron", None):
-        sched.add_cron_job(executor_func, args=[params], jobstore=_FHANDLE, **params["parsed_cron"])
+        sched.add_cron_job(executor_func, args=[params], jobstore=_FHANDLE, **params[task_params.PARSED_CRON])
     else:
         raise Exception, "Shouldn't ever be here."
 

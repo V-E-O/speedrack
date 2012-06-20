@@ -24,7 +24,7 @@ import yaml
 
 class TaskList():
     ''' A list of all currently scheduled Tasks. Currently polled from the
-    scheduler. '''
+    scheduler and the unscheduled tasks existing on disk. '''
     
     def __init__(self,
                  job_root_dir = None,
@@ -214,10 +214,18 @@ class Task():
         return dirs
 
     def get_executions(self, count = None):
+        '''
+        Get list of {count} most recent executions; or all if
+        {count} > number of executions.
+        '''
         if not count:
             count = self.count
         dirs = self._get_execution_dirs()
-        results = [Execution(x) for x in dirs]
+        results = []
+        if len(dirs) > count:
+            results = [Execution(x) for x in dirs[:count]]
+        else:
+            results = [Execution(x) for x in dirs]
         return results
 
     @memoize
@@ -253,6 +261,7 @@ class Task():
         return Execution(previous_timestamp)
 
     def get_last_execution(self):
+        '''Returns None if no executions found.'''
         results = self.get_executions(1)
         if not results or len(results) == 0:
             return None

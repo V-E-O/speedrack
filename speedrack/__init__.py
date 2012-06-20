@@ -98,8 +98,8 @@ def launch_services():
         from flask.ext.debugtoolbar import DebugToolbarExtension
         DebugToolbarExtension(app) # returns the toolbar; we don't need it
 
-    start_logger()
     config_paths()
+    start_logger()
     filer.assert_no_tilde(app.config[con.JOB_ROOT_DIR])
     if not os.path.exists(app.config[con.JOB_ROOT_DIR]):
         os.makedirs(app.config[con.JOB_ROOT_DIR])

@@ -459,6 +459,10 @@ def is_execution_success(execution,
     fail_by_stderr = default_fail_by_stderr
     fail_by_retcode = default_fail_by_retcode
 
+    app.logger.debug("{0} {1}: fail_by_stderr {2}".format(execution.name, execution.timestamp, fail_by_stderr))
+    app.logger.debug("{0} {1}: fail_by_retcode {2}".format(execution.name, execution.timestamp, fail_by_retcode))
+    app.logger.debug("{0} {1}: status code: {2}".format(execution.name, execution.timestamp, execution.get_status_code()))
+
     # a task's individual settings override application settings
     if execution.has_params():
         params_read = execution.get_op_params()
@@ -482,9 +486,6 @@ def is_execution_success(execution,
         app.logger.debug("%s %s: status code: %d" % (execution.name, execution.timestamp, execution.get_status_code()))
         return False
 
-    app.logger.debug("{0} {1}: fail_by_stderr {2}".format(execution.name, execution.timestamp, fail_by_stderr))
-    app.logger.debug("{0} {1}: fail_by_retcode {2}".format(execution.name, execution.timestamp, fail_by_retcode))
-    app.logger.debug("{0} {1}: status code: {2}".format(execution.name, execution.timestamp, execution.get_status_code()))
     return True
 
 
@@ -615,9 +616,9 @@ class Execution():
         try:
             params = json.loads(params_read)
         except Exception as inst:
-            msg = "Exception parsing {0} {1} params:\n{2}\n{3}\n{4}".format(
+            msg = "Exception parsing {0} {1} params from json:\n{2}\n{3}\n{4}".format(
                 str(self.name), self.timestamp, params_read, inst, traceback.format_exc())
-            app.logger.error(msg)
+            app.logger.warn(msg)
             return None
         return params
 

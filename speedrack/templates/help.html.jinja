@@ -32,22 +32,18 @@
 
   <h3>Scheduling by Interval</h3>
   <p>A simple joined string: <tt class="docutils literal">1h10m</tt> means every one hour, ten minutes. Full vocabulary:</p>
-  <pre class="literal-block">
-    { 'M': month, 'w': week, 'd': day, 'h': hour, 'm': minute, 's': second }
-  </pre>
+  <pre class="literal-block">{ 'M': month, 'w': week, 'd': day, 'h': hour, 'm': minute, 's': second }</pre>
   <p>Don't forget that <em>interval</em> measures the time <em>between</em> complete executions -- a task that takes roughly ten minutes to complete with an interval of thirty minutes will kick off roughly every forty minutes, not every thirty minutes.</p>
 
   <h3>Scheduling by cron</h3>
   <p>See APScheduler's documentation for <a class="reference external" href="http://readthedocs.org/docs/apscheduler/en/latest/modules/scheduler.html#apscheduler.scheduler.Scheduler.add_cron_job">add_cron_job</a>. In summary:</p>
-  <pre class="literal-block">
-    year - 4-digit year to run on
+  <pre class="literal-block">  year - 4-digit year to run on
     month - month to run on (1-12)
     day - day of month to run on (1-31)
     week - week of the year to run on (1-53)
     day_of_week - weekday to run on (0-6, 0 = Monday; or "mon","tue",...)
     hour - hour to run on (0-23)
-    second - second to run on (0-59)
-  </pre>
+    second - second to run on (0-59)</pre>
   <p>(There are also fancier <a href="http://packages.python.org/APScheduler/cronschedule.html#expression-types">expression types</a> available.)</p>
   <p>Examples:</p>
   <ul class="simple">

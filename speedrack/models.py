@@ -459,7 +459,8 @@ def is_execution_success(execution,
 
     app.logger.debug("{0} {1}: fail_by_stderr {2}".format(execution.name, execution.timestamp, fail_by_stderr))
     app.logger.debug("{0} {1}: fail_by_retcode {2}".format(execution.name, execution.timestamp, fail_by_retcode))
-    app.logger.debug("{0} {1}: status code: {2}".format(execution.name, execution.timestamp, execution.get_status_code()))
+    if execution.has_status_code():
+        app.logger.debug("{0} {1}: status code: {2}".format(execution.name, execution.timestamp, execution.get_status_code()))
 
     # a task's individual settings override application settings
     if execution.has_params():

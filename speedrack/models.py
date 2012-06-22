@@ -187,14 +187,12 @@ class Task():
             return None
         return job_dir
 
-    @memoize
     def count_executions(self):
         return len(self._get_execution_dirs())
 
     def has_executions(self):
         return self.count_executions() > 0
 
-    @memoize
     def _get_execution_dirs(self):
         '''
         List of all execution directories, absolute paths.

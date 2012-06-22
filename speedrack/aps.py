@@ -175,6 +175,7 @@ def new_params(config_block):
     description = config_block.get(task_params.DESCRIPTION, None)
     max_keep = config_block.get(task_params.MAX_KEEP, None)
     command = config_block.get(task_params.COMMAND, None)
+
     fail_by_retcode = config_block.get(task_params.FAIL_BY_RETCODE, None)
     fail_by_stderr = config_block.get(task_params.FAIL_BY_STDERR, None)
 

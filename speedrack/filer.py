@@ -70,6 +70,6 @@ def clear_old_dirs(path, max_keep):
     all_dirs = os.listdir(path)
     if max_keep > len(all_dirs):
         return
-    dirs_to_delete = all_dirs[:-max_keep]
+    dirs_to_delete = all_dirs[max_keep:]
     for one_del in dirs_to_delete:
         remove_shallow_dir(os.path.join(path, one_del))

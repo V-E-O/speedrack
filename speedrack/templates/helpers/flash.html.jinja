@@ -7,14 +7,14 @@
 {% endmacro -%}
 
 {# Valid: "success", "error", "warning", "info" #}
-{% macro alert_class(category) -%}alert-{{ category }}{%- endmacro %}
+{%- macro alert_class(category) -%}alert-{{ category }}{%- endmacro -%}
 
 {%- macro render_all_flash() %}
-{% with messages = get_flashed_messages(with_categories=True) %}
-  {% if messages %}
+{%- with messages = get_flashed_messages(with_categories=True) %}
+  {%- if messages %}
     {% for category, message in messages %}
       {{ render_flash(message, category) }}
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+    {%- endfor %}
+  {% endif -%}
+{% endwith -%}
 {% endmacro -%}

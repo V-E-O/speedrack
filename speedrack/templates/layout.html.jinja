@@ -20,8 +20,8 @@
   {{ stylesheet("bootstrap.css") }}
   <style>
     body {
-    padding-top: 60px;
-    padding-bottom: 40px;
+      padding-top: 60px;
+      padding-bottom: 40px;
     }
   </style>
 
@@ -36,50 +36,46 @@
 
 <body>
 
-  <div class="container-fluid">
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
 
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
+        <a class="brand" href="{{ url_for('show_tasks') }}">{{ config['APP_NAME'] }}</a>
 
-          <a class="brand" href="{{ url_for('show_tasks') }}">{{ config['APP_NAME'] }}</a>
+        <div class="nav-collapse">
+          <ul class="nav">
+	    {% block navigation_list %}{{ render_nav() }}{% endblock %}
+	    <li class="divider-vertical"></li>
+	    <li><p class="navbar-text">Up since: {{ datetime_launch|datetimeformat }}</p></li>
+          </ul>
+	  <div class="nav pull-right">
+	    <ul class="nav">
+	      <li><a class="navbar-btn" href="{{ url_for('toggle_inactive_tasks') }}"><i class="icon-eye-open icon-white"></i>
+		{% if g.hide_inactive %}Hiding{% else %}Showing{% endif %} Inactive</a>
+	      </li>
+	      <li><a class="navbar-btn" href="{{ url_for('reload_config') }}"><i class="icon-refresh icon-white"></i>
+		Reload Config</a>
+	      </li>
+	    </ul>
+          </div>
+        </div><!--/.nav-collapse -->
 
-          <div class="nav-collapse">
-            <ul class="nav">
-	      {% block navigation_list %}{{ render_nav() }}{% endblock %}
-	      <li class="divider-vertical"></li>
-	      <li><p class="navbar-text">Up since: {{ datetime_launch|datetimeformat }}</p></li>
-            </ul>
-	    <div class="nav pull-right">
-	      <ul class="nav">
-		<li><a class="navbar-btn" href="{{ url_for('toggle_inactive_tasks') }}"><i class="icon-eye-open icon-white"></i>
-		  {% if g.hide_inactive %}Hiding{% else %}Showing{% endif %} Inactive</a>
-		</li>
-		<li><a class="navbar-btn" href="{{ url_for('reload_config') }}"><i class="icon-refresh icon-white"></i>
-		  Reload Config</a>
-		</li>
-	      </ul>
-            </div>
-          </div><!--/.nav-collapse -->
-
-
-	</div>
       </div>
     </div>
+  </div>
 
-    {%- block content %}
-    Sample content.
-    {% endblock content -%}
+  {%- block content %}
+  Sample content.
+  {% endblock content -%}
 
+  {%- block footer %}
+  <div class="container-fluid">
     <hr>
-
-    {%- block footer %}
     <p>
       <a href="https://bitbucket.org/clinthowarth/speedrack">Speedrack</a> = &Pi; <a href="http://flask.pocoo.org/">Flask</a> &times; <a href="http://twitter.github.com/bootstrap/">Bootstrap</a> &times; <a href="http://packages.python.org/APScheduler/">Advanced Python Scheduler</a> &times; elbow grease
     </p>
-    {% endblock footer -%}
-
-    </div>{# container-fluid #}
+  </div>
+  {% endblock footer -%}
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>

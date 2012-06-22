@@ -1,5 +1,5 @@
 #!env python
-VERSION='0.1.d'
+VERSION='0.2.b'
 #TOOD: from something import version
 
 import sys, os

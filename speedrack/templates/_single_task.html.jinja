@@ -37,7 +37,13 @@
               <table class="table table-condensed">
                 <tr>
                   <td>Next scheduled run</td>
-                  <td>{% if display_task.active %}{{ display_task.next_run_time }}{% else %}<em>Not active</em>{% endif %}</td>
+                  <td>{% if display_task.conf_error -%}
+		    <em>Conf error</em>
+		    {%- elif display_task.active -%}
+		    {{ display_task.next_run_time }}
+		    {%- else -%}
+		    <em>Not active</em>
+		    {% endif %}</td>
                 </tr>
                 <tr>
                   <td># runs since startup</td>

@@ -15,7 +15,7 @@
           <h1>{{ display_task.name }}</h1>
           <div class="row-fluid"> {# task header #}
 
-            <div class="span5">
+            <div class="span7">
               {%- if display_task.description is not none -%}
               <p class="lead">{{ display_task.description }}</p>
               {%- endif -%}
@@ -33,7 +33,7 @@
               {% endif -%}
             </div>
 
-            <div class="span7">
+            <div class="span5">
               <table class="table table-condensed">
                 <tr>
                   <td>Next scheduled run</td>

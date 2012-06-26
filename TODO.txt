@@ -14,8 +14,6 @@ sphinx / readthedocs
 improve README.rst
 improve help page
 
-different failure modes
-
 Future
 ======
 

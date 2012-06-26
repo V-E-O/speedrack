@@ -141,6 +141,8 @@ def executor_func(params):
     spam             = params.get(task_params.SPAM, None)
     description      = params.get(task_params.DESCRIPTION, None)
     max_keep         = params.get(task_params.MAX_KEEP, None)
+    fail_by_stderr   = params.get(task_params.FAIL_BY_STDERR, None)
+    fail_by_retcode  = params.get(task_params.FAIL_BY_RETCODE, None)
 
     ex = models.Executor(name, command)
     ex.config = config
@@ -150,6 +152,8 @@ def executor_func(params):
         ex.max_keep = int(max_keep)
     if spam:
         ex.spam = spam
+    ex.fail_by_stderr = fail_by_stderr
+    ex.fail_by_retcode = fail_by_retcode
     ex.parsed_interval = parsed_interval
     ex.parsed_cron = parsed_cron
     ex.email_recipients = email_recipients

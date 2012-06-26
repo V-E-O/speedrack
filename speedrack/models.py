@@ -604,19 +604,20 @@ class Execution():
     @memoize
     def get_op_params(self):
         if not self.has_params():
+            app.logger.info("{0} {1}: no parameters found".format(str(self.name), self.timestamp))
             return None
 
         with open(self.op_params) as fin:
             params_read = fin.read()
 
         if not params_read:
+            app.logger.info("{0} {1}: parameters empty".format(str(self.name), self.timestamp))
             return None
-
         try:
             params = json.loads(params_read)
         except Exception as inst:
-            msg = "Exception parsing {0} {1} params from json:\n{2}\n{3}\n{4}".format(
-                str(self.name), self.timestamp, params_read, inst, traceback.format_exc())
+            msg = "Exception parsing {0} {1} params from json:\n{2}\n{3}".format(
+                str(self.name), self.timestamp, inst, traceback.format_exc())
             app.logger.warn(msg)
             return None
         return params

@@ -30,10 +30,13 @@
 
   <h2>Interval vs Cron</h2>
 
+  <p>In Speedrack terms, interval and cron jobs are the same until you talk about execution error cases.</p>
+  <p>Interval jobs in speedrack are no big deal when they're missed. Every <em>interval</em> time, speedrack will attempt to launch the job in question. If another one is running, it won't, and it won't feel badly about it.</p>
+  <p>Cron jobs hold grudges and view missed runs as a queue to work through.</p>
+
   <h3>Scheduling by Interval</h3>
   <p>A simple joined string: <tt class="docutils literal">1h10m</tt> means every one hour, ten minutes. Full vocabulary:</p>
   <pre class="literal-block">{ 'M': month, 'w': week, 'd': day, 'h': hour, 'm': minute, 's': second }</pre>
-  <p>Don't forget that <em>interval</em> measures the time <em>between</em> complete executions -- a task that takes roughly ten minutes to complete with an interval of thirty minutes will kick off roughly every forty minutes, not every thirty minutes.</p>
 
   <h3>Scheduling by cron</h3>
   <p>See APScheduler's documentation for <a class="reference external" href="http://readthedocs.org/docs/apscheduler/en/latest/modules/scheduler.html#apscheduler.scheduler.Scheduler.add_cron_job">add_cron_job</a>. In summary:</p>

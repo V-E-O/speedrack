@@ -40,7 +40,7 @@
 
   <h3>Scheduling by cron</h3>
   <p>See APScheduler's documentation for <a class="reference external" href="http://readthedocs.org/docs/apscheduler/en/latest/modules/scheduler.html#apscheduler.scheduler.Scheduler.add_cron_job">add_cron_job</a>. In summary:</p>
-  <pre class="literal-block">  year - 4-digit year to run on
+  <pre class="literal-block">    year - 4-digit year to run on
     month - month to run on (1-12)
     day - day of month to run on (1-31)
     week - week of the year to run on (1-53)
@@ -68,16 +68,21 @@
   <p><em>Active</em> tasks are currently scheduled via (re)loading <code>&lt;arg&gt;.yaml</code></p>
   <p><em>Inactive</em> tasks are discovered histories in the same directory set by <code>JOB_ROOT_DIR</code>. Inactive jobs don't have a "Run Now" ability, and max_runs is not respected.</p>
 
-
   <h2>Task Settings</h2>
 
   <dl>
 
     <dt><code>max_keep</code></dt>
-    <dd>Set per task. Only effective for active (that is, scheduled) tasks.</dd>
+    <dd>Only effective for active tasks.</dd>
 
     <dt><code>name</code></dt>
-    <dd>Set per task. The task history for a task is stored via directory name, based on task name. Changing this name resets bookkeeping for the task and probably leaves an inactive task in its wake.</dd>
+    <dd>The task history for a task is stored via directory name, based on task name. Changing this name resets bookkeeping for the task and probably leaves an inactive task in its wake.</dd>
+
+    <dt><code>fail_by_stderr</code></dt>
+    <dd>Default True. Set to 'false' if generating stderr is not a task failure.</dd>
+
+    <dt><code>fail_by_retcode</code></dt>
+    <dd>Default True. Set to 'false' if a return code of nonzero is not a task failure.</dd>
 
   </dl>
 

@@ -36,7 +36,7 @@
 
     {% set msg = jobs|length|string + " jobs in the scheduler right now" %}
     {{ render_flash(msg, "info") }}
-    {% for job in jobs -%}
+    {% for job in jobs|sort(attribute='next_run_time') -%}
     <div class="row-fluid">
       <div class="span3"> 
 	<h4>{{ job.args[0].name }}</h4>
@@ -44,7 +44,7 @@
       <div class="span9">
 	<p>signature: <pre>{{ job }}</pre></p>
 	<p>next execution time: <pre>{{ job.next_run_time }}</pre></p>
-	<p>args: <pre>{{ job.args[0]|safe|pprint }}</pre></p>
+	<p>args: <pre>{{ job.args[0]|pprint }}</pre></p>
       </div>
     </div>
     {% endfor -%}
@@ -52,9 +52,9 @@
   {% elif display_data == "settings" %}
   <p>From <code>config/default.py</code> and other config files. Fixed; require server restart to change</p>
   <pre>
-    {% for key, value in config|dictsort -%}
-      {{ key }} : {{ value }}
-    {% endfor -%}
+{% for key, value in config|dictsort -%}
+{{ key }} : {{ value }}
+{% endfor -%}
   </pre>
 
   {% elif display_data == "raw" %}

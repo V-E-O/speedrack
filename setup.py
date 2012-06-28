@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 # if you change this version, also change __init__.py and cmdline.py
-version = "0.2.d"
+version = "0.2.e"
 
 with open('README.rst') as f:
     readme = f.read()

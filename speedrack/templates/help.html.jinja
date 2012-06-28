@@ -28,46 +28,52 @@
     {% endfor %}
   </table>
 
-  <h2>Interval vs Cron</h2>
+  <h2>Task Execution</h2>
+
+  <h3>Interval vs Cron</h3>
 
   <p>In Speedrack terms, interval and cron jobs are the same until you talk about execution error cases.</p>
   <p>Cron jobs are workaholics and view missed runs as a queue to work through.</p>
   <p>Interval jobs are laid back. Every <em>interval</em> time, speedrack will attempt to launch the job in question. If a previous iteration is still running, it will go and get a drink and chill.</p>
-  <p><strong><tt>Reload Config</tt> resets intervals.</strong> When you <tt class="docutils literal">Reload Config</tt>, you start the <em>interval</em> timer again. If you've set a long interval (36h) and <tt>Reload Config</tt> at hour 35, your system will go 71 hours between jobs.</p>
 
   <h3>Scheduling by Interval</h3>
-  <p>A simple joined string: <tt class="docutils literal">1h10m</tt> means every one hour, ten minutes. Full vocabulary:</p>
+  <p>A simple joined string: <tt>1h10m</tt> means every one hour, ten minutes. Full vocabulary:</p>
   <pre class="literal-block">{ 'M': month, 'w': week, 'd': day, 'h': hour, 'm': minute, 's': second }</pre>
 
   <h3>Scheduling by cron</h3>
   <p>See APScheduler's documentation for <a class="reference external" href="http://readthedocs.org/docs/apscheduler/en/latest/modules/scheduler.html#apscheduler.scheduler.Scheduler.add_cron_job">add_cron_job</a>. In summary:</p>
-  <pre class="literal-block">    year - 4-digit year to run on
-    month - month to run on (1-12)
-    day - day of month to run on (1-31)
-    week - week of the year to run on (1-53)
-    day_of_week - weekday to run on (0-6, 0 = Monday; or "mon","tue",...)
-    hour - hour to run on (0-23)
-    second - second to run on (0-59)</pre>
+  <pre class="literal-block">year - 4-digit year to run on
+month - month to run on (1-12)
+day - day of month to run on (1-31)
+week - week of the year to run on (1-53)
+day_of_week - weekday to run on (0-6, 0 = Monday; or "mon","tue",...)
+hour - hour to run on (0-23)
+second - second to run on (0-59)</pre>
   <p>(There are also fancier <a href="http://packages.python.org/APScheduler/cronschedule.html#expression-types">expression types</a> available.)</p>
   <p>Examples:</p>
   <ul class="simple">
-    <li><tt class="docutils literal">{ &quot;day_of_week&quot;: 2, &quot;hour&quot;: 23 }</tt>: Tuesdays at 23:00</li>
-    <li><tt class="docutils literal">{ &quot;day&quot;: 2, &quot;hour&quot;: 23 }</tt>: The 2nd of every month at 23:00</li>
-    <li><tt class="docutils literal">{ &quot;hour&quot;: 23 }</tt>: Every day at 23:00</li>
+    <li><tt>{ &quot;day_of_week&quot;: 2, &quot;hour&quot;: 23 }</tt>: Wednesdays at 23:00</li>
+    <li><tt>{ &quot;day&quot;: 2, &quot;hour&quot;: 23 }</tt>: The 2nd of every month at 23:00</li>
+    <li><tt>{ &quot;hour&quot;: 23 }</tt>: Every day at 23:00</li>
   </ul>
 
   <h3>Run Now</h3>
-  <p>Using <tt class="docutils literal">Run Now</tt> does not modify the next launch time. It schedules a parallel execution that happens <em>in addition</em> to your other scheduling. Be aware of the following:</p>
+  <p>Using <tt>Run Now</tt> does not modify the next launch time and <strong>executes in a separate queue</strong>. Your <tt>Run Now</tt> is a parallel execution that happens <em>in addition</em> to your other scheduling. Be aware of the following:</p>
   <ul class="simple">
     <li>Start at 00:00:00, cron set to every 30m.</li>
-    <li>At 00:29:00, click <tt class="docutils literal">Run Now</tt>.</li>
+    <li>At 00:29:00, click <tt>Run Now</tt>, starts running.</li>
     <li>At 00:30:00, Speedrack executes the scheduled task, perhaps in parallel with the manually submitted one.</p>
   </ul>
   
   <h2>Active/Inactive Tasks</h2>
 
-  <p><em>Active</em> tasks are currently scheduled via (re)loading <code>&lt;arg&gt;.yaml</code></p>
-  <p><em>Inactive</em> tasks are discovered histories in the same directory set by <code>JOB_ROOT_DIR</code>. Inactive jobs don't have a "Run Now" ability, and max_runs is not respected.</p>
+  <dl>
+    <dt>Active</dt>
+    <dd>currently running; scheduled via (re)loading <code>&lt;arg&gt;.yaml</code></dd>
+
+    <dt>Inactive</dt>
+    <dd>discovered histories in the same directory set by <code>JOB_ROOT_DIR</code>. Inactive jobs don't have a <tt>Run Now</tt> ability, and <code>max_runs</code> is not respected.</dd>
+  </dl>
 
   <h2>Task Settings</h2>
 
@@ -87,8 +93,10 @@
 
   </dl>
 
-  <h2>Reload Config</h2>
+  <h2>Reload Config resets intervals</h2>
 
+  <p><tt>Reload Config</tt> resets intervals.</p>
+  <p><em><tt>Reload Config</tt> resets intervals.</em> <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals. <tt>Reload Config</tt> resets intervals.</p>
   <p><strong><tt>Reload Config</tt> resets intervals.</strong></p>
 
 </div>

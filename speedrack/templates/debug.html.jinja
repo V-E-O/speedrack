@@ -33,7 +33,7 @@
   <div class="container-fluid"> 
     <p><strong>{{ jobs|length }}</strong> jobs in the scheduler right now:</p>
     <div class="span12">
-      {% for job in jobs|sort -%}
+      {% for job in jobs -%}
       <div class="row-fluid">
       <div class="span3"> 
 	<h4>{{ job.args[0].name }}</h4>

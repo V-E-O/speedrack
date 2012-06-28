@@ -131,7 +131,6 @@ def show_debug():
             display_data = 'settings'
 
     jobs = app._sched.get_jobs()
-    jobs.sort()
     return render_template("debug.html.jinja",
                            jobs=jobs,
                            display_data=display_data)

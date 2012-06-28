@@ -83,24 +83,6 @@ def run_task(task_name = None):
     flash("Submitted [%s] for immediate execution." % task_name, "info")
     return redirect(url_for('show_tasks', task_name = task_name, just_launched = True))
 
-
-@app.route("/config")
-def show_config():
-    yaml_config = models.Config(app.config['CONFIG_YAML'])
-
-    display_data = 'raw'
-    if ('raw' in request.args
-        or 'parsed' in request.args):
-        
-        if 'raw' in request.args:
-            display_data = 'raw'
-        elif 'parsed' in request.args:
-            display_data = 'parsed'
-
-    return render_template("config.html.jinja",
-                           yaml_config=yaml_config,
-                           display_data=display_data)
-
 @app.route("/config/reload")
 def reload_config():
     app._shutdown = True
@@ -110,29 +92,37 @@ def reload_config():
     app._shutdown = False
     _flash_msg = "Reloaded config file: {conf}".format(conf=app.config.get('CONFIG_YAML', None))
     flash(_flash_msg, "success")
-    return redirect(url_for('show_config'))
+    return redirect(url_for('show_debug'))
 
 @app.route("/config/clear")
 def clear_config():
     aps.clear(app._sched,
               app.config.get('JOB_STATE', None))
     flash("Scheduler cleared of running tasks; consider reloading config now.")
-    return redirect(url_for('show_config'))
+    return redirect(url_for('show_debug'))
 
 @app.route("/debug")
 def show_debug():
+    yaml_config = models.Config(app.config['CONFIG_YAML'])
     display_data = 'scheduled'
     if ('scheduled' in request.args
-        or 'settings' in request.args):
+        or 'settings' in request.args
+        or 'raw' in request.args
+        or 'parsed' in request.args):
 
         if 'scheduled' in request.args:
             display_data = 'scheduled'
         elif 'settings' in request.args:
             display_data = 'settings'
+        elif 'raw' in request.args:
+            display_data = 'raw'
+        elif 'parsed' in request.args:
+            display_data = 'parsed'
 
     jobs = app._sched.get_jobs()
     return render_template("debug.html.jinja",
                            jobs=jobs,
+                           yaml_config=yaml_config,
                            display_data=display_data)
 
 @app.route("/help")

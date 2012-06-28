@@ -13,7 +13,6 @@ class TestRoutes(object):
     def test_routes(self):
         tests = [
             ("/", "show_tasks"),
-            ("/config", "show_config"),
             ("/config/clear", "clear_config"),
             ("/config/reload", "reload_config"),
             ("/debug", "show_debug"),

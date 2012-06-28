@@ -1,4 +1,5 @@
 {% extends "layout.html.jinja" %}
+{% from "helpers/flash.html.jinja" import render_flash %}
 {% from "helpers/link_to.html.jinja" import link_to %}
 {% from "helpers/file.html.jinja" import mono_file_summary %}
 
@@ -27,25 +28,26 @@
   <ul class="nav nav-tabs">
     {{ tab("scheduled", "live scheduled jobs") }}
     {{ tab("settings", "application settings ") }}
+    {{ tab("raw", "raw yaml file ") }}
+    {{ tab("parsed", "parsed configuration ") }}
   </ul>
 
   {% if display_data == "scheduled" %}
-  <div class="container-fluid"> 
-    <p><strong>{{ jobs|length }}</strong> jobs in the scheduler right now:</p>
-    <div class="span12">
-      {% for job in jobs -%}
-      <div class="row-fluid">
+
+    {% set msg = jobs|length|string + " jobs in the scheduler right now" %}
+    {{ render_flash(msg, "info") }}
+    {% for job in jobs -%}
+    <div class="row-fluid">
       <div class="span3"> 
 	<h4>{{ job.args[0].name }}</h4>
       </div>
       <div class="span9">
 	<p>signature: <pre>{{ job }}</pre></p>
-	<p>args: <pre>{{ job.args }}</pre></p>
+	<p>next execution time: <pre>{{ job.next_run_time }}</pre></p>
+	<p>args: <pre>{{ job.args[0]|safe|pprint }}</pre></p>
       </div>
-      </div>
-      {% endfor -%}
     </div>
-  </div>
+    {% endfor -%}
 
   {% elif display_data == "settings" %}
   <p>From <code>config/default.py</code> and other config files. Fixed; require server restart to change</p>
@@ -54,7 +56,16 @@
       {{ key }} : {{ value }}
     {% endfor -%}
   </pre>
+
+  {% elif display_data == "raw" %}
+  <p><code>{{ config['CONFIG_YAML'] }}</code></p>
+  <pre class="prettyprint lang-yaml">{{ filer.get_file_summary(config['CONFIG_YAML'], max_size = none) }}</pre>
+
+  {% elif display_data == "parsed" %}
+  <pre class="prettyprint lang-python">{{ yaml_config }}</pre>
+
   {% endif %}
+
 
 </div>
 

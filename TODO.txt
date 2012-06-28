@@ -12,7 +12,6 @@ refactor models.Executor / Task / aps.executor_func
 
 sphinx / readthedocs
 improve README.rst
-improve help page
 
 Future
 ======

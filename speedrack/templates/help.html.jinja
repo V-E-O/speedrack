@@ -31,8 +31,9 @@
   <h2>Interval vs Cron</h2>
 
   <p>In Speedrack terms, interval and cron jobs are the same until you talk about execution error cases.</p>
-  <p>Interval jobs in speedrack are no big deal when they're missed. Every <em>interval</em> time, speedrack will attempt to launch the job in question. If another one is running, it won't, and it won't feel badly about it.</p>
-  <p>Cron jobs hold grudges and view missed runs as a queue to work through.</p>
+  <p>Cron jobs are workaholics and view missed runs as a queue to work through.</p>
+  <p>Interval jobs are laid back. Every <em>interval</em> time, speedrack will attempt to launch the job in question. If a previous iteration is still running, it will go and get a drink and chill.</p>
+  <p><strong><tt>Reload Config</tt> resets intervals.</strong> When you <tt class="docutils literal">Reload Config</tt>, you start the <em>interval</em> timer again. If you've set a long interval (36h) and <tt>Reload Config</tt> at hour 35, your system will go 71 hours between jobs.</p>
 
   <h3>Scheduling by Interval</h3>
   <p>A simple joined string: <tt class="docutils literal">1h10m</tt> means every one hour, ten minutes. Full vocabulary:</p>
@@ -85,6 +86,10 @@
     <dd>Default True. Set to 'false' if a return code of nonzero is not a task failure.</dd>
 
   </dl>
+
+  <h2>Reload Config</h2>
+
+  <p><strong><tt>Reload Config</tt> resets intervals.</strong></p>
 
 </div>
 

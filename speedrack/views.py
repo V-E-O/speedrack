@@ -114,13 +114,27 @@ def reload_config():
 
 @app.route("/config/clear")
 def clear_config():
-    aps.clear(app._sched)
+    aps.clear(app._sched,
+              app.config.get('JOB_STATE', None))
     flash("Scheduler cleared of running tasks; consider reloading config now.")
     return redirect(url_for('show_config'))
 
 @app.route("/debug")
 def show_debug():
-    return render_template("debug.html.jinja")
+    display_data = 'scheduled'
+    if ('scheduled' in request.args
+        or 'settings' in request.args):
+
+        if 'scheduled' in request.args:
+            display_data = 'scheduled'
+        elif 'settings' in request.args:
+            display_data = 'settings'
+
+    jobs = app._sched.get_jobs()
+    jobs.sort()
+    return render_template("debug.html.jinja",
+                           jobs=jobs,
+                           display_data=display_data)
 
 @app.route("/help")
 def show_help():

@@ -12,13 +12,49 @@
 
   {{ render_all_flash() }}
 
-  <h2>application settings</h2>
-  <p>From config/default.py and other config files. Fixed; require server restart to change</p>
+  {%- macro is_active(expected, actual) -%}
+  {%- if expected == actual -%}
+  "active"
+  {%- endif -%}
+  {%- endmacro %}
+
+  {%- macro tab(name, linktext) -%}
+  <li class={{ is_active(display_data, name|lower) }}>
+    <a href="{{ url_for('show_debug') }}?{{ name }}">{{ linktext }}</a></td>
+  </li>
+  {%- endmacro -%}
+
+  <ul class="nav nav-tabs">
+    {{ tab("scheduled", "live scheduled jobs") }}
+    {{ tab("settings", "application settings ") }}
+  </ul>
+
+  {% if display_data == "scheduled" %}
+  <div class="container-fluid"> 
+    <p><strong>{{ jobs|length }}</strong> jobs in the scheduler right now:</p>
+    <div class="span12">
+      {% for job in jobs|sort -%}
+      <div class="row-fluid">
+      <div class="span3"> 
+	<h4>{{ job.args[0].name }}</h4>
+      </div>
+      <div class="span9">
+	<p>signature: <pre>{{ job }}</pre></p>
+	<p>args: <pre>{{ job.args }}</pre></p>
+      </div>
+      </div>
+      {% endfor -%}
+    </div>
+  </div>
+
+  {% elif display_data == "settings" %}
+  <p>From <code>config/default.py</code> and other config files. Fixed; require server restart to change</p>
   <pre>
     {% for key, value in config|dictsort -%}
       {{ key }} : {{ value }}
     {% endfor -%}
   </pre>
+  {% endif %}
 
 </div>
 

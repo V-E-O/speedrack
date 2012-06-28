@@ -1,5 +1,6 @@
 # Application interface to APScheduler
 from datetime import datetime, date, timedelta
+import os
 import re
 
 from apscheduler.scheduler import Scheduler
@@ -68,8 +69,8 @@ def update(sched, yaml_file, job_state_file):
     # http://readthedocs.org/docs/apscheduler/en/latest/index.html#job-persistency
 
     logger.info("Update requested, waiting on running jobs.")
-    sched.shutdown()
-    clear(sched)
+    shutdown(sched)
+    clear(sched, job_state_file)
 
     # Also, a given scheduler cannot be restarted once it's shut down.
     # So in essence, we're gracefully stopping the scheduler and
@@ -82,12 +83,25 @@ def update(sched, yaml_file, job_state_file):
     sched.start()
     return sched
 
-def clear(sched):
+def clear(sched, job_state_file):
+    '''detaching from existing jobstore isn't sufficient. must
+    clear and rebuild'''
+
+    # Above is not literally true. It would be possible to walk each
+    # task and diff it agains the reloaded one.
+
     logger.info("Clear requested, removing filestore.")
     try:
         sched.remove_jobstore(_FHANDLE)
     except KeyError:
         logger.debug("No existing jobstore, skipping.")
+
+    # this is a filthy hack but I can't find why I get .db on
+    # OSX and not on CentOS linux
+    if os.path.isfile(job_state_file):
+        os.unlink(job_state_file)
+    elif os.path.isfile(job_state_file + ".db"):
+        os.unlink(job_state_file + ".db")
 
 def run_task(sched, task_name):
     '''Executes a given task immediately. In APScheduler, this is

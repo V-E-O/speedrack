@@ -10,9 +10,6 @@ more tests
 
 refactor models.Executor / Task / aps.executor_func
 
-sphinx / readthedocs
-improve README.rst
-
 Future
 ======
 
@@ -22,7 +19,7 @@ Future
 
 add ability to list all jobs (or what, 100?) if asked instead of pithy message
 
-run now
+run now improvements
 - store "manual execution" in job history / display?
 - store "executed by"?
 

@@ -4,6 +4,7 @@ sample.py
 sample.yml
 sample.yaml
 sample_sprack/
+speedrack-docs
 logs/
 jobs/
 *shelve.db

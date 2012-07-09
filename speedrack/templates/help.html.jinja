@@ -79,17 +79,23 @@ second - second to run on (0-59)</pre>
 
   <dl>
 
-    <dt><code>max_keep</code></dt>
-    <dd>Only effective for active tasks.</dd>
-
     <dt><code>name</code></dt>
     <dd>The task history for a task is stored via directory name, based on task name. Changing this name resets bookkeeping for the task and probably leaves an inactive task in its wake.</dd>
+
+    <dt><code>descriptions</code></dt>
+    <dd>140 characters for your task will make it read nicer.</dd>
 
     <dt><code>fail_by_stderr</code></dt>
     <dd>Default True. Set to 'false' if generating stderr is not a task failure.</dd>
 
     <dt><code>fail_by_retcode</code></dt>
     <dd>Default True. Set to 'false' if a return code of nonzero is not a task failure.</dd>
+
+    <dt><code>max_keep</code></dt>
+    <dd>Only effective for active tasks.</dd>
+
+    <dt><code>spam</code></dt>
+    <dd>Will send a notification email, win or lose.</dd>
 
   </dl>
 

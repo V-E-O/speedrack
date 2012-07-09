@@ -9,6 +9,9 @@ logs/
 jobs/
 *shelve.db
 
+dist/
+*egg-info*
+
 .gitignore
 .git
 *.elc

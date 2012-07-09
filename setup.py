@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 # if you change this version, also change __init__.py and cmdline.py
-version = "0.2.e"
+version = "0.2.f"
 
 with open('README.rst') as f:
     readme = f.read()
@@ -48,9 +48,8 @@ data = dict(
     long_description = readme,
     keywords         = "speedrack cron webcron",
     classifiers      = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
-        'Framework :: Flask',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 2',
         'Topic :: System :: Monitoring',

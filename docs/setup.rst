@@ -1,18 +1,22 @@
 Installation and Demo Mode
 --------------------------
 
-Speedrack requires *Python 2.6+*.
+Speedrack requires *Python 2.6+*. Python comes with easy_install.
 
-Please use virtualenv. If you've avoided it until now: it's really better. (If you don't have ``pip``, prepend the following instructions with: ``easy_install pip``)
+(If you don't have ``pip``, prepend the following instructions with: ``easy_install pip``)
 
 ::
 
     pip install speedrack
     speedrack run
 
-Open a browser at ``localhost:8118``, see the demo tasks churning (can take a minute). Note that some of the test tasks are designed to fail (and often), to illustrate what failure would look like. Likewise with misconfigured tasks, and so on.
+Open a browser at ``http://localhost:8118``, see the demo tasks churning (can take a minute). Note that some of the test tasks are designed to fail (and often), to illustrate what failure would look like. Likewise with misconfigured tasks, and so on.
 
 Don't expose this to the internet; **it's not even trying for security**.
+
+(If you have have libevent/`gevent`_ installed, Speedrack will run using that. Flask's dev server is fine, too.)
+
+.. _gevent: http://www.gevent.org
 
 Configuration
 -------------
@@ -42,4 +46,4 @@ Once you've got your settings and tasks in place:
 
     speedrack run --settings speedrack_settings.py --tasks speedrack_tasks.yaml
 
-Browse ``localhost:8118/config`` to check your active configuration at any time.
+Browse ``http://localhost:8118/config`` to check your active configuration at any time.

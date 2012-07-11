@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 # if you change this version, also change __init__.py and cmdline.py
-version = "0.2.g"
+version = "0.2.h"
 
 with open('README.rst') as f:
     readme = f.read()
@@ -19,7 +19,6 @@ install_requires = [
     'APScheduler==2.0.3',
     'Flask==0.8',
     'PyYAML==3.10',
-    'gevent',
 ]
 
 data = dict(

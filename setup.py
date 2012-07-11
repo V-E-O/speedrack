@@ -2,8 +2,8 @@
 
 from setuptools import setup, find_packages
 
-# if you change this version, also change __init__.py and cmdline.py
-version = "0.2.h"
+# also change __init__.py and cmdline.py and docs/conf.py and docs/changes.rst
+version = "0.2.8"
 
 with open('README.rst') as f:
     readme = f.read()

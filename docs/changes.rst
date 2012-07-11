@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.2.8
+  standard numbering scheme
+
 0.2.h
   use gevent if available, otherwise use Flask's development server
   gevent/libevent is no longer a hard requirement, and is not installed with speedrack

@@ -14,3 +14,5 @@ Contents:
    setup
    task execution
    about
+   changes
+   todo

@@ -1,7 +1,11 @@
 About
 -----
 
-What's a *speedrack*? At a bar or food service event, the most common mixins are kept at arm-level, for efficiency -- this is the speedrack. Every reach is lost time, strain, and the line gets longer. Likewise, every reach for data or regular task execution, the line's getting longer. And like a lot of geeks, I'll work three days to save myself three minutes during crunch times. It's nice when things just work.
+What's a *speedrack*? At a bar or food service event, the most common mixins are kept at arm-level, for efficiency — this is the speedrack. Every reach is lost time, more fatigue, and the line gets longer. Likewise, every reach for data or regular task execution, the line's getting longer.
+
+Like a lot of geeks, I'll work three days to save myself three minutes during crunch times. It's nice when things just work.
+
+(note: this took longer than three days)
 
 Ingredients
 ~~~~~~~~~~~
@@ -16,8 +20,7 @@ Some notes to hopefully save some effort on everyone's part.
 - *Bugs*: love to hear about them!
 - *Simple contributions* (known bugs, docs, typos, tweaks): just fork and request pull (tests <3)
 - *Complex contributions* (new features): *email first*
-- *Suggestions to do it right*: No thanks!
-
+- *Suggestions to do it right*: Save yourself time. :)
 
 Gratitute and Inspiration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,7 +40,7 @@ Alternatives
 
 Please, play the field. This solution works well for my team, but you should look at what else is out there.
 
-For example, if you have a group of machines you'd like to run tasks on, please investigate `Celery`_ or `RQ`_ -- they're both quality work. There are countless alternatives, and most of them are probably better than this.
+For example, if you have a group of machines you'd like to run tasks on, please investigate `Celery`_ or `RQ`_ — they're both quality work. There are countless alternatives, and most of them are probably better than this.
 
 Speedrack is trivial to set up and administer. It runs well on one node. It's a good bad solution.
 

@@ -1,12 +1,18 @@
 #!env python
-VERSION='0.2.g'
+VERSION='0.2.h'
 #TOOD: from something import version
 
 import sys, os
 sys.path.insert(0, os.path.join(sys.path.pop(0), ".."))
 
 import argparse
-from gevent.wsgi import WSGIServer
+
+with_gevent = False
+try:
+    from gevent.wsgi import WSGIServer
+    with_gevent = True
+except ImportError:
+    sys.stdout.write("Couldn't find gevent, using dev server.\n")
 
 def _get_default_config():
     SPEEDRACK_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -96,9 +102,11 @@ settings: %s
 yaml: %s""" % (port, str(settings_file), str(yaml_file))
 
     speedrack.app.logger.info(msg)
-    if debug:
+    if not with_gevent or debug:
+        speedrack.app.logger.info("Speedrack serving via flask-dev server.")
         speedrack.app.run(host="0.0.0.0", debug=debug, port=port)
     else:
+        speedrack.app.logger.info("Speedrack serving via gevent.")
         http_server = WSGIServer(('', port), speedrack.app)
         http_server.serve_forever()
     speedrack.app.logger.warn("STARTED")

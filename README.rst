@@ -24,6 +24,8 @@ Speedrack comes with a demo mode, so look at your sample tasks churn. Results fo
 
 For more information, please visit `speedrack's documentation`_.
 
-.. _speedrack's documentation: http://speedrack.readthedocs.org/
+For a picture, please visit `speedrack's introduction post`_.
 
+.. _speedrack's documentation: http://speedrack.readthedocs.org/
+.. _speedrack's introduction post: http://spaceponies.com/speedrack-initial-release/
 

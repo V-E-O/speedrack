@@ -48,7 +48,9 @@ copyright = u'2012, Clint Howarth'
 # built documents.
 #
 # The short X.Y version.
-version = '0.2.8'
+
+sys.path.insert(0, os.path.abspath('../'))
+from speedrack import version
 # The full version, including alpha/beta/rc tags.
 release = version
 

@@ -2,6 +2,10 @@
 Changes
 =======
 
+0.2.9
+  reduce number of copied version strings
+  add placeholder for tasks with no description
+
 0.2.8
   standard numbering scheme
 

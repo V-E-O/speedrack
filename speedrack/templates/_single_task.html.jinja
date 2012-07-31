@@ -1,7 +1,7 @@
 {%- from "helpers/flash.html.jinja" import render_flash, render_all_flash with context -%}
 {%- from "helpers/file.html.jinja" import mono_file_summary -%}
-	<div class="row-fluid">
-	<div class="span12">
+        <div class="row-fluid">
+        <div class="span12">
           {{ render_all_flash() }}
           {%- if display_task is none -%}
 
@@ -18,6 +18,8 @@
             <div class="span7">
               {%- if display_task.description is not none -%}
               <p class="lead">{{ display_task.description }}</p>
+              {%- else -%}
+              <p class="lead"><em>No description available</em></p>
               {%- endif -%}
 
               {%- if just_launched or display_task.running %}
@@ -38,12 +40,12 @@
                 <tr>
                   <td>Next scheduled run</td>
                   <td>{% if display_task.conf_error -%}
-		    <em>Conf error</em>
-		    {%- elif display_task.active -%}
-		    {{ display_task.next_run_time }}
-		    {%- else -%}
-		    <em>Not active</em>
-		    {% endif %}</td>
+                    <em>Conf error</em>
+                    {%- elif display_task.active -%}
+                    {{ display_task.next_run_time }}
+                    {%- else -%}
+                    <em>Not active</em>
+                    {% endif %}</td>
                 </tr>
                 <tr>
                   <td># runs since startup</td>
@@ -65,7 +67,7 @@
             <div class="alert alert">
               <h4 class="alert-heading">Wait, what?</h4>
               Couldn't find any results or schedule information for this task.
-	      Is it <a href="{{ url_for('show_debug') }}">misconfigured</a>?
+              Is it <a href="{{ url_for('show_debug') }}">misconfigured</a>?
             </div>
 
             {%- else -%}

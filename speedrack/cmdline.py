@@ -1,9 +1,9 @@
 #!env python
-VERSION='0.2.8'
-#TOOD: from something import version
 
 import sys, os
 sys.path.insert(0, os.path.join(sys.path.pop(0), ".."))
+
+from speedrack import version
 
 import argparse
 
@@ -115,7 +115,7 @@ yaml: %s""" % (port, str(settings_file), str(yaml_file))
 def main():
 
     # create the top-level parser
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(version=version)
 
     subparsers = parser.add_subparsers(help='commands')
 

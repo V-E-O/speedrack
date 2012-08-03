@@ -68,6 +68,35 @@ def show_tasks(task_name = None, timestamp = None):
                            just_launched = just_launched,
         )
 
+@app.route("/tasks/<task_name>/<timestamp>/<display_label>")
+def show_task_file(task_name = None, timestamp = None, display_label = None):
+    if task_name is None:
+        flash("How did you get here with no task? It's a mystery.", "error")
+        return redirect(url_for('show_tasks'))
+    if timestamp is None:
+        flash("How did you get here with no timestamp? It's a mystery.", "error")
+        return redirect(url_for('shot_tasks', task_name=task_name))
+    if display_label is None:
+        flash("How did you get here with no file? It's a mystery.", "error")
+        return redirect(url_for('show_tasks', task_name=task_name))
+
+    task_list = models.TaskList(sched = app._sched)
+    task_name = task_name.lower()
+    display_task = task_list.find_task(task_name)
+    display_execution = display_task.find_execution(timestamp)
+
+    display_file = None
+    if 'stderr' == display_label:
+        display_file = display_execution.std_err
+    elif 'stdout' == display_label:
+        display_file = display_execution.std_out
+
+    return render_template("file.html.jinja",
+                           task_name = task_name,
+                           timestamp = timestamp,
+                           display_label = display_label,
+                           file_name = display_file)
+
 @app.route("/tasks/<task_name>/execute")
 def run_task(task_name = None):
     if task_name is None:

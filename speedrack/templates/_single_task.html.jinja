@@ -149,6 +149,9 @@
 
               {%- if display_file %}
               {{ mono_file_summary(filer, display_file, config['FSIZE_MAX'], config['FSIZE_SUMMARY']) }}
+                {%- if filer.is_file(display_file) and filer.get_size(display_file) -%}
+                <p><a class="btn btn-primary" href="{{ url_for('show_task_file', task_name=display_task.name, timestamp=display_execution.timestamp, display_label=display_label) }}">View whole file &raquo;</a>
+                {%- endif -%}
               {% else %}
               <div class="alert alert-block">
                 <h4 class="alert-heading">Nothing to show here.</h4>

@@ -36,6 +36,7 @@
 
 <body>
 
+  {% block nav %}
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
@@ -48,6 +49,7 @@
 	    <li class="divider-vertical"></li>
 	    <li><p class="navbar-text">Up since: {{ datetime_launch|datetimeformat }}</p></li>
           </ul>
+	  {% block nav_extended %}
 	  <div class="nav pull-right">
 	    <ul class="nav">
 	      <li><a class="navbar-btn" href="{{ url_for('toggle_inactive_tasks') }}"><i class="icon-eye-open icon-white"></i>
@@ -58,11 +60,13 @@
 	      </li>
 	    </ul>
           </div>
+	  {% endblock nav_extended %}
         </div><!--/.nav-collapse -->
 
       </div>
     </div>
   </div>
+  {% endblock nav %}
 
   {%- block content %}
   Sample content.

@@ -1,4 +1,4 @@
-version_info = (0, 2, 9)
+version_info = (0, 2, 10)
 version = '.'.join(str(n) for n in version_info[:3])
 release = version + ''.join(str(n) for n in version_info[3:])
 

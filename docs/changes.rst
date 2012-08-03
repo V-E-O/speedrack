@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.2.10
+  add single-file view
+
 0.2.9
   reduce number of copied version strings
   add placeholder for tasks with no description

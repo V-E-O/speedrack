@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.2.11
+  add params tab to show single-task execution criteria
+
 0.2.10
   add single-file view
 

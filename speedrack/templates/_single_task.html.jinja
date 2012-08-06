@@ -141,6 +141,10 @@
                   {{ tab("stderr", "(no stderr)") }}
                 {% endif -%}
 
+                {%- if display_execution.has_params() %}
+                  {{ tab("opparams", "params") }}
+                {% endif %}
+
                 {%- if display_execution.execution_error() %}
                   {{ tab("operror", "OPERATION ERROR") }}
                 {% endif -%}

@@ -43,11 +43,15 @@ def show_tasks(task_name = None, timestamp = None):
         # if we have a specific request, honor that; otherwise deduce
         # the best
         if ('operror' in request.args
+            or 'opparams' in request.args
             or 'stderr' in request.args
             or 'stdout' in request.args):
             if 'operror' in request.args:
                 display_label = 'operror'
                 display_file = display_execution.op_error
+            elif 'opparams' in request.args:
+                display_label = 'opparams'
+                display_file = display_execution.op_params
             elif 'stderr' in request.args:
                 display_label = 'stderr'
                 display_file = display_execution.std_err
@@ -75,7 +79,7 @@ def show_task_file(task_name = None, timestamp = None, display_label = None):
         return redirect(url_for('show_tasks'))
     if timestamp is None:
         flash("How did you get here with no timestamp? It's a mystery.", "error")
-        return redirect(url_for('shot_tasks', task_name=task_name))
+        return redirect(url_for('show_tasks', task_name=task_name))
     if display_label is None:
         flash("How did you get here with no file? It's a mystery.", "error")
         return redirect(url_for('show_tasks', task_name=task_name))
@@ -90,6 +94,8 @@ def show_task_file(task_name = None, timestamp = None, display_label = None):
         display_file = display_execution.std_err
     elif 'stdout' == display_label:
         display_file = display_execution.std_out
+    elif 'params' == display_label:
+        display_file = display_execution.op_params
 
     return render_template("file.html.jinja",
                            task_name = task_name,

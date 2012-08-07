@@ -113,9 +113,8 @@
                 <h2>{{ display_execution.timestamp }}</h2>
               </div>
 
+              {# tab display is a mixture of contents of execution and user request #}
               <ul class="nav nav-tabs">
-
-                {# TODO: This section is really horrible, but functional. #}
 
                 {%- macro is_active(expected, actual) -%}
                 {%- if expected == actual -%}
@@ -125,29 +124,37 @@
 
                 {%- macro tab(name, linktext) -%}
                 <li class={{ is_active(display_label, name|lower) }}>
-                  <a href="{{ url_for('show_tasks', task_name=display_task.name, timestamp=display_execution.timestamp) }}?{{ name }}">{{ linktext }}</a></td>
+                  <a href="{{ url_for('show_tasks', task_name=display_task.name, timestamp=display_execution.timestamp) }}?{{ name }}">
+                    {{ linktext }}
+                  </a>
                 </li>
                 {%- endmacro -%}
 
-                {%- if display_execution.has_std_out() %}
-                  {{ tab("stdout", "stdout " + filer.get_humanized_size(display_execution.std_out)) }}
-                {%- else %}
-                  {{ tab("stdout", "(no stdout)") }}
+                {%- macro cond_tab(state, condition, cond_true_text, cond_false_text=None) -%}
+                {%- if condition() %}
+                  {{ tab(state, cond_true_text) }}
+                {%- elif cond_false_text %} {# none = no tab #}
+                  {{ tab(state, cond_false_text) }}
                 {% endif -%}
+                {%- endmacro -%}
 
-                {%- if display_execution.has_std_err() %}
-                  {{ tab("stderr", "stderr " + filer.get_humanized_size(display_execution.std_err)) }}
-                {% else -%}
-                  {{ tab("stderr", "(no stderr)") }}
-                {% endif -%}
+                {{ cond_tab("stdout",
+                            display_execution.has_std_out,
+                            "stdout " + filer.get_humanized_size(display_execution.std_out),
+                            "(no stdout)") }}
 
-                {%- if display_execution.has_params() %}
-                  {{ tab("opparams", "params") }}
-                {% endif %}
+                {{ cond_tab("stderr",
+                            display_execution.has_std_err,
+                            "stderr " + filer.get_humanized_size(display_execution.std_err),
+                            "(no stderr)") }}
 
-                {%- if display_execution.execution_error() %}
-                  {{ tab("operror", "OPERATION ERROR") }}
-                {% endif -%}
+                {{ cond_tab("opparams",
+                            display_execution.has_params,
+                            "params") }}
+
+                {{ cond_tab("operror",
+                            display_execution.execution_error,
+                            "OPERATION ERROR") }}
 
               </ul>
 

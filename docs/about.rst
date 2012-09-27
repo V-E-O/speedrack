@@ -22,7 +22,7 @@ Some notes to hopefully save some effort on everyone's part.
 - *Complex contributions* (new features): *email first*
 - *Suggestions to do it right*: Save yourself time. :)
 
-Gratitute and Inspiration
+Gratitude and Inspiration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The good parts of this Flask application drew on knowledge and practices that `Andrew Roberts`_ and I accumulated in our work together. He's excellent; the bad parts are all mine.

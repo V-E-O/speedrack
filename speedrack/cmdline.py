@@ -28,8 +28,6 @@ def _get_default_yaml():
 def init(target_path=None):
     """
     write fresh control files (speedrack_settings.py and speedrack_tasks.yml)
-
-    :param: target_path: absolute path to directory to write speedrack control files (default: ./)
     """
 
     STOCK_SETTINGS = _get_default_settings()
@@ -120,8 +118,6 @@ def main():
     subparsers = parser.add_subparsers(help='commands')
 
     init_parser = subparsers.add_parser('init', help='write fresh control files (speedrack_settings.py and speedrack_tasks.yml)')
-    init_parser.add_argument('dirname', default=None, action='store',
-                             help='absolute path to directory to write speedrack control files (default: cwd)')
     init_parser.set_defaults(func=init)
 
     run_parser = subparsers.add_parser('run', help='launch the speedrack application')
@@ -142,10 +138,12 @@ def main():
     args = parser.parse_args()
 
     # wow, now I understand why there are so many argument-parsing replacements
-    args.func(debug         = args.debug,
-              port          = args.port,
-              settings_file = args.settings_file,
-              yaml_file     = args.yaml_file)
+
+    # omg !@#$%^& argparse
+    command = args.func
+    arguments = vars(args)
+    del arguments['func']
+    command(**arguments)
 
 if __name__ == '__main__':
     main()

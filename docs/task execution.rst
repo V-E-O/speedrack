@@ -4,7 +4,7 @@ Task Execution
 Scheduling
 ----------
 
-Speedrack uses simple strings for *interval* (``1h10m``) and APScheduler's `add\_cron\_job`_ for *cron* scheduling (e.g. ``{ "day_of_week": 2, "hour": 23 }. The most current documentation is in the app itself, under the Help tab.
+Speedrack uses simple strings for *interval* (``1h10m``) and APScheduler's `add\_cron\_job`_ for *cron* scheduling (e.g. ``{ "day_of_week": 2, "hour": 23 }``. The most current documentation is in the app itself, under the Help tab.
 
 Speedrack can launch jobs *immediately* via the Run Now button.
 

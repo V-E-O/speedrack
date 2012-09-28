@@ -374,8 +374,11 @@ class Executor():
         # email 'if needed'
         # TODO: this -> somewhere else?
         if not app.config.get(con.EMAIL_DISABLED, None):
+            app.logger.debug("{0} testing for signal (run)".format(self.name))
             response = self.needs_notification(execution)
-            if response:
+            app.logger.debug("{0} test response: {1}".format(self.name, response))
+            if response is not False:
+                app.logger.debug("{0} sending email".format(self.name))
                 self.send_email(execution, response)
 
         # cleanup old runs if needed
@@ -397,6 +400,8 @@ class Executor():
         to_addresses.extend(global_addresses)
         if self.email_recipients:
             to_addresses.extend(self.email_recipients)
+
+        app.logger.debug("Attempting to send email to: {0}".format(str(to_addresses)))
 
         from_address = app.config.get(con.EMAIL_FROM_ADDRESS)
         smtp_server = app.config.get(con.EMAIL_SMTP)

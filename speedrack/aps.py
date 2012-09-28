@@ -199,9 +199,11 @@ def new_params(config_block):
 
     email_recipients = config_block.get(task_params.TASK_EMAIL, None)
     if email_recipients:
-        email_recipients = ",".split(email_recipients)
+        email_recipients = email_recipients.split(",")
     else:
         email_recipients = []
+
+    spam = config_block.get(task_params.SPAM, None)
 
     unparsed_interval = config_block.get(task_params.TASK_INTERVAL, None)
     parsed_interval = timing.parse_interval(unparsed_interval)
@@ -220,6 +222,7 @@ def new_params(config_block):
         task_params.FAIL_BY_STDERR: fail_by_stderr,
         task_params.FAIL_BY_RETCODE: fail_by_retcode,
         task_params.CONFIG: config_block,
+        task_params.SPAM: spam,
     }
 
     # In erroneous configurations, we add a dummy job with an

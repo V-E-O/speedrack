@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.3.0
+  fixed email and spam settings
+
 0.2.11
   add params tab to show single-task execution criteria
 

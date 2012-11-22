@@ -118,6 +118,7 @@ def is_conf_error(params):
 # returns string with message if notification
 # is needed, otherwise False
 def needs_notification(execution,
+                       previous_executions = None,
                        spam = None):
 
     if spam:

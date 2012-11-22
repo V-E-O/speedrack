@@ -50,6 +50,7 @@ def remove_shallow_dir(path):
         file_path = os.path.join(path, the_file)
         try:
             os.unlink(file_path)
+        # consuming errors
         except Exception, e:
             print e
     try:

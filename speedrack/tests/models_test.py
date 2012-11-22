@@ -14,6 +14,7 @@ NOTIFICATION_TASK = "notification_test"
 
 # Note that unlike default Task execution sorting, this
 # is chronologically ascending
+# (correspond to testdata/sample_task)
 EXECUTIONS_GOOD = [
     "2012-05-03_18:40:44",
     "2012-05-03_18:41:44",
@@ -96,6 +97,38 @@ class TestTask(object):
     def test_get_last_execution(self):
         e = self.t.get_last_execution()
         assert_equals(e.timestamp, EXECUTIONS_GOOD[-1])
+
+    def test_find_previous_executions_good_one(self):
+        prevs = self.t.find_previous_executions(EXECUTIONS_GOOD[1], count=1)
+        assert_equals(1, len(prevs))
+        assert_equals(EXECUTIONS_GOOD[0], prevs[0].timestamp)
+
+    def test_find_previous_executions_good_one_overcount(self):
+        prevs = self.t.find_previous_executions(EXECUTIONS_GOOD[1], count=10)
+        assert_equals(1, len(prevs))
+        assert_equals(EXECUTIONS_GOOD[0], prevs[0].timestamp)
+
+    def test_find_previous_executions_good_two(self):
+        prevs = self.t.find_previous_executions(EXECUTIONS_GOOD[2], count=2)
+        assert_equals(2, len(prevs))
+        timestamps = [x.timestamp for x in prevs]
+        assert_in(EXECUTIONS_GOOD[0], timestamps)
+        assert_in(EXECUTIONS_GOOD[1], timestamps)
+
+    def test_find_previous_executions_good_two_overcount(self):
+        prevs = self.t.find_previous_executions(EXECUTIONS_GOOD[2], count=10)
+        assert_equals(2, len(prevs))
+        timestamps = [x.timestamp for x in prevs]
+        assert_in(EXECUTIONS_GOOD[0], timestamps)
+        assert_in(EXECUTIONS_GOOD[1], timestamps)
+
+    def test_find_previous_executions_bad_first(self):
+        prevs = self.t.find_previous_executions(EXECUTIONS_GOOD[0])
+        assert_is_none(prevs)
+
+    def test_find_previous_executions_bad_nomatch(self):
+        prevs = self.t.find_previous_executions(EXECUTION_BAD)
+        assert_is_none(prevs)
 
 
 class TestExecution(object):
@@ -271,28 +304,28 @@ class TestNeedsNotification(object):
             patch.object(self.e0, 'success', return_value=True)):
 
             assert_false(
-                models.needs_notification(self.e0, prev_exec = None, spam = False))
+                models.needs_notification(self.e0, previous_executions = None, spam = False))
 
     def test_initial_success_no_prev_with_spam(self):
         with nested(
             patch.object(self.e0, 'success', return_value=True)):
 
             assert_equal("success",
-                models.needs_notification(self.e0, prev_exec = None, spam = True))
+                models.needs_notification(self.e0, previous_executions = None, spam = True))
 
     def test_initial_failure_no_prev_no_spam(self):
         with nested(
             patch.object(self.e0, 'success', return_value=False)):
 
             assert_equal("failed",
-                models.needs_notification(self.e0, prev_exec = None, spam = False))
+                models.needs_notification(self.e0, previous_executions = None, spam = False))
 
     def test_initial_failure_no_prev_with_spam(self):
         with nested(
             patch.object(self.e0, 'success', return_value=False)):
 
             assert_equal("failed",
-                models.needs_notification(self.e0, prev_exec = None, spam = True))
+                models.needs_notification(self.e0, previous_executions = None, spam = True))
 
     def test_failure_after_failure_no_spam(self):
         with nested(
@@ -300,7 +333,7 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=False)):
 
             assert_false(
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = False))
 
     def test_failure_after_failure_with_spam(self):
         with nested(
@@ -308,7 +341,7 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=False)):
 
             assert_equal("failed",
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = True))
 
     def test_success_after_failure_no_spam(self):
         with nested(
@@ -316,7 +349,7 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=False)):
 
             assert_equal("success",
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = False))
 
     def test_success_after_failure_with_spam(self):
         with nested(
@@ -324,7 +357,7 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=False)):
 
             assert_equal("success",
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = True))
 
     def test_success_after_success_no_spam(self):
         with nested(
@@ -332,7 +365,7 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=True)):
 
             assert_false(
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = False))
 
     def test_success_after_success_with_spam(self):
         with nested(
@@ -340,7 +373,7 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=True)):
 
             assert_equal("success",
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = True))
 
     def test_failure_after_success_no_spam(self):
         with nested(
@@ -348,7 +381,7 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=True)):
 
             assert_equal("failed",
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = False))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = False))
 
     def test_failure_after_success_with_spam(self):
         with nested(
@@ -356,7 +389,33 @@ class TestNeedsNotification(object):
             patch.object(self.e1, 'success', return_value=True)):
 
             assert_equal("failed",
-                models.needs_notification(self.e0, prev_exec = self.e1, spam = True))
+                models.needs_notification(self.e0, previous_executions = [self.e1], spam = True))
+
+
+class TestNeedsNotificationWithConsecutiveFailures(object):
+
+    def setup(self):
+        e0_path = os.path.join(TESTDATA_PATH,
+                               SAMPLE_TASK,
+                               EXECUTIONS_GOOD[0])
+        self.e0 = models.Execution(e0_path)
+        self.e1 = models.Execution(e0_path)
+
+    def test_two_consec_with_two_failures(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False),
+            patch.object(self.e1, 'success', return_value=False)):
+
+            pass
+
+    def test_two_consec_with_one_failure(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=True),
+            patch.object(self.e1, 'success', return_value=False)):
+
+#            assert_equal("failed",
+#                         models.needs_notification(self.e0, previous_executions = [self.e1], spam = True))
+            pass
 
 
 class TestIsConfError(object):

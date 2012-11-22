@@ -117,14 +117,30 @@ def is_conf_error(params):
 # if spam, just answer with success/fail
 # returns string with message if notification
 # is needed, otherwise False
-def needs_notification(execution, prev_exec = None, spam = None):
+def needs_notification(execution,
+                       spam = None):
+
+    if spam:
+        if not execution.success():
+            return "failed"
+        else:
+            return "success"
+
+    if previous_executions and len(previous_executions) != 1:
+        for execution in previous_executions:
+            if execution.success():
+                return False
+
+    prev_exec = None
+    if previous_executions:
+        prev_exec = previous_executions[0]
 
     if (not execution.success()
-        and (spam or not prev_exec or prev_exec.success())):
+        and (not prev_exec or prev_exec.success())):
         return "failed"
 
     if (execution.success()
-        and (spam or (prev_exec and not prev_exec.success()))):
+        and (prev_exec and not prev_exec.success())):
         return "success"
 
     return False
@@ -245,18 +261,40 @@ class Task():
         return None
 
     def find_previous_execution(self, timestamp):
-        '''Get previous execution to the given timestamp; None if
-        given cannot be found or previous timestamp not available'''
+        pevs = self.find_previous_executions(timestamp)
+        if pevs and len(pevs):
+            return pevs[0]
+        return None
+
+    def find_previous_executions(self, timestamp, count=1):
+        '''Get :count: previous executions to the given timestamp;
+        None if given timestamp cannot be found or previous timestamp
+        is not available'''
+
         dirs = self._get_execution_dirs()
+
+        if not dirs:
+            return None
+
         this_index = -1
+
         for i, x in enumerate(dirs):
             if os.path.split(x)[-1] == timestamp:
                 this_index = i
                 break
+
         if this_index in (-1, len(dirs)-1):
             return None
-        previous_timestamp = dirs[i+1]
-        return Execution(previous_timestamp)
+
+        previous_timestamps = []
+        if count == 1:
+            previous_timestamps = [dirs[i+1]]
+        elif len(dirs) - i <= count:
+            previous_timestamps = dirs[i+1:]
+        else:
+            previous_timestamps = dirs[i+1:i+1+count]
+
+        return [Execution(timestamp) for timestamp in previous_timestamps]
 
     def get_last_execution(self):
         '''Returns None if no executions found.'''
@@ -340,8 +378,8 @@ class Executor():
 
     def needs_notification(self, execution):
         _task = Task(execution.name, job_root_dir = execution.task_root)
-        prev_exec = _task.find_previous_execution(execution.timestamp)
-        return needs_notification(execution, prev_exec, self.spam)
+        previous_executions = _task.find_previous_execution(execution.timestamp)
+        return needs_notification(execution, previous_executions, self.spam)
 
     def run(self):
         '''execute task, ping notifiers, clean up old tasks'''
@@ -456,7 +494,8 @@ class Executor():
 
 def is_execution_success(execution,
                          default_fail_by_stderr,
-                         default_fail_by_retcode):
+                         default_fail_by_retcode,
+                         count = 1):
     # failing by retcode means either not finding a retcode OR finding
     # a retcode other than 0
     fail_by_stderr = default_fail_by_stderr

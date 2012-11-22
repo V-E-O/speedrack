@@ -11,6 +11,7 @@ Todo
 Future
 ------
 
+- "retain X previous failures", to prevent issues from being flushed out by successes
 - "config file updated" flag
   - upper right, with "reload"
   - your store was created X, config file updated later than X

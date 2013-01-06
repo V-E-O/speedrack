@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.3.1
+  added simple sudo controls
+
 0.3.0
   fixed email and spam settings
 

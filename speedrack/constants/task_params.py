@@ -6,6 +6,7 @@ MAX_KEEP = "max_keep"
 FAIL_BY_STDERR = "fail_by_stderr"
 FAIL_BY_RETCODE = "fail_by_retcode"
 CONFIG = "config"
+SUDO_USER = "sudo"
 
 # yaml-friendly parameters
 TASK_EMAIL = "email"

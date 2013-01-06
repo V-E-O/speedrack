@@ -334,6 +334,7 @@ class Executor():
         self.parsed_cron = None
         self.parsed_interval = None
         self.spam = None
+        self.sudo_user = None
         self.fail_by_stderr = None
         self.fail_by_retcode = None
 
@@ -353,6 +354,7 @@ class Executor():
             task_params.MAX_KEEP        : self.max_keep,
             task_params.FAIL_BY_STDERR  : self.fail_by_stderr,
             task_params.FAIL_BY_RETCODE : self.fail_by_retcode,
+            task_params.SUDO_USER       : self.sudo_user,
         }
         
     def get_conf_error(self):
@@ -400,7 +402,10 @@ class Executor():
             execution.start_running()
             with open(execution.std_out, "w") as fout, \
                 open(execution.std_err, "w") as ferr:
-                status_code = subprocess.call(self.command, stdout=fout, stderr=ferr, shell=True)
+                cmd = self.command
+                if self.sudo_user:
+                    cmd = "sudo -u {0} {1}".format(self.sudo_user, self.command)
+                status_code = subprocess.call(cmd, stdout=fout, stderr=ferr, shell=True)
             execution.write_status_code(status_code)
         except Exception as inst:
             msg = "Exception running %s:\n%s\n%s" % (str(self.name), inst, traceback.format_exc())

@@ -10,13 +10,19 @@ Speedrack can launch jobs *immediately* via the Run Now button.
 
 .. _`add_cron_job`: http://readthedocs.org/docs/apscheduler/en/latest/modules/scheduler.html#apscheduler.scheduler.Scheduler.add_cron_job
 
-
 Success / Failure
 -----------------
 
 ``FAIL_BY_NONZERO_STATUS_CODE`` and ``FAIL_BY_STDERR`` determine different indicators of task failure, both defaulted to true. Setting both of these to false will work, but you'll get less information in the task browser.
 
-This is also configurable per task. You have to get the defaults / exceptions right.
+This is also configurable per task. The administrator is responsible for getting the defaults / exceptions right.
+
+Sudo control
+------------
+
+Sudo execution requires the hosting user to have password-free sudo access to the given user. Commands will end up being equivalent to:
+
+    $ sudo -u task_sudo_user task_command
 
 Config Reloading
 ----------------

@@ -157,6 +157,7 @@ def executor_func(params):
     max_keep         = params.get(task_params.MAX_KEEP, None)
     fail_by_stderr   = params.get(task_params.FAIL_BY_STDERR, None)
     fail_by_retcode  = params.get(task_params.FAIL_BY_RETCODE, None)
+    sudo_user        = params.get(task_params.SUDO_USER, None)
 
     ex = models.Executor(name, command)
     ex.config = config
@@ -171,6 +172,7 @@ def executor_func(params):
     ex.parsed_interval = parsed_interval
     ex.parsed_cron = parsed_cron
     ex.email_recipients = email_recipients
+    ex.sudo_user = sudo_user
     ex.run()
 
 
@@ -204,6 +206,7 @@ def new_params(config_block):
         email_recipients = []
 
     spam = config_block.get(task_params.SPAM, None)
+    sudo_user = config_block.get(task_params.SUDO_USER, None)
 
     unparsed_interval = config_block.get(task_params.TASK_INTERVAL, None)
     parsed_interval = timing.parse_interval(unparsed_interval)
@@ -223,6 +226,7 @@ def new_params(config_block):
         task_params.FAIL_BY_RETCODE: fail_by_retcode,
         task_params.CONFIG: config_block,
         task_params.SPAM: spam,
+        task_params.SUDO_USER: sudo_user,
     }
 
     # In erroneous configurations, we add a dummy job with an

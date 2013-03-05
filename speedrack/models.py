@@ -25,7 +25,7 @@ import yaml
 class TaskList():
     ''' A list of all currently scheduled Tasks. Currently polled from the
     scheduler and the unscheduled tasks existing on disk. '''
-    
+
     def __init__(self,
                  job_root_dir = None,
                  sched = None):
@@ -324,7 +324,7 @@ class Task():
 class Executor():
     ''' Callable with a memory. '''
     def __init__(self, name, command, max_keep = None,
-                 job_root_dir = None):
+                 job_root_dir = None, sudo_user = None):
         self.command = command
         self.config = None
         self.description = None
@@ -334,7 +334,7 @@ class Executor():
         self.parsed_cron = None
         self.parsed_interval = None
         self.spam = None
-        self.sudo_user = None
+        self.sudo_user = sudo_user
         self.fail_by_stderr = None
         self.fail_by_retcode = None
 
@@ -356,7 +356,7 @@ class Executor():
             task_params.FAIL_BY_RETCODE : self.fail_by_retcode,
             task_params.SUDO_USER       : self.sudo_user,
         }
-        
+
     def get_conf_error(self):
         return is_conf_error(self.get_op_params())
 
@@ -381,7 +381,7 @@ class Executor():
 
     def needs_notification(self, execution):
         _task = Task(execution.name, job_root_dir = execution.task_root)
-        previous_executions = _task.find_previous_execution(execution.timestamp)
+        previous_executions = _task.find_previous_executions(execution.timestamp)
         return needs_notification(execution, previous_executions, self.spam)
 
     def run(self):

@@ -42,9 +42,13 @@ def init(target_path=None):
     if not os.path.isdir(target_path):
         sys.stderr.write("Couldn't find target path: %s\n" % target_path)
         sys.exit(1)
+    TARGET_SETTINGS = os.path.join(target_path, DEFAULT_SETTINGS)
+    TARGET_YAML = os.path.join(target_path, DEFAULT_TASKS)
     sys.stdout.write("Creating {settings} and {tasks}\n".format(settings=DEFAULT_SETTINGS, tasks=DEFAULT_TASKS))
-    shutil.copy(STOCK_SETTINGS, os.path.join(target_path, DEFAULT_SETTINGS))
-    shutil.copy(STOCK_YAML, os.path.join(target_path, DEFAULT_TASKS))
+    shutil.copy(STOCK_SETTINGS, TARGET_SETTINGS)
+    os.chmod(TARGET_SETTINGS, 0664)
+    shutil.copy(STOCK_YAML, TARGET_YAML)
+    os.chmod(TARGET_YAML, 0664)
     sys.stdout.write("Speedrack configuration files created.\n")
 
 def run(debug=False, port=8118, settings_file="", yaml_file=""):

@@ -37,6 +37,8 @@ Task definitions and behavior
 
 ``speedrack_tasks.yaml`` defines each *task*: a shell command and schedule of execution. The sample file contains the tasks used for the demo you started with.
 
+.. warning:: **Restrict access to this file.** Speedrack reads this file and executes the commands therein, *as the user who launched speedrack*. ``speedrack init`` gets the basic settings correct, but if you build your own, you should remove global write (and group, if necessary).
+
 Running
 -------
 

@@ -403,19 +403,36 @@ class TestNeedsNotificationWithConsecutiveFailures(object):
 
     def test_two_consec_with_two_failures(self):
         with nested(
-            patch.object(self.e0, 'success', return_value=False),
-            patch.object(self.e1, 'success', return_value=False)):
+            patch.object(self.e0, 'success', return_value=False), # current run
+            patch.object(self.e1, 'success', return_value=False)  # previous run
+        ):
 
-            pass
+            assert_equal("failed",
+                         models.needs_notification(self.e0,
+                                                   previous_executions = [self.e1],
+                                                   spam = True))
 
     def test_two_consec_with_one_failure(self):
         with nested(
-            patch.object(self.e0, 'success', return_value=True),
-            patch.object(self.e1, 'success', return_value=False)):
+            patch.object(self.e0, 'success', return_value=True), # current run
+            patch.object(self.e1, 'success', return_value=False) # previous run
+        ):
 
-#            assert_equal("failed",
-#                         models.needs_notification(self.e0, previous_executions = [self.e1], spam = True))
-            pass
+            assert_equal("success",
+                         models.needs_notification(self.e0,
+                                                   previous_executions = [self.e1],
+                                                   spam = True))
+
+    def test_two_consec_with_two_failures_spam_fail(self):
+        with nested(
+            patch.object(self.e0, 'success', return_value=False), # current run
+            patch.object(self.e1, 'success', return_value=False)  # previous run
+        ):
+
+            assert_equal("failed",
+                         models.needs_notification(self.e0,
+                                                   previous_executions = [self.e1],
+                                                   spam_fail = True))
 
 
 class TestIsConfError(object):

@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.4
+  added spam_fail setting, for hammering failure messages
+
 0.3.1
   added simple sudo controls
 

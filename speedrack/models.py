@@ -114,19 +114,29 @@ def is_conf_error(params):
     return False
 
 
-# if spam, just answer with success/fail
-# returns string with message if notification
-# is needed, otherwise False
+# returns string "success" or "failed" if a notification is necessary
+# returns False if no notification needed
 def needs_notification(execution,
                        previous_executions = None,
-                       spam = None):
+                       spam = None,
+                       spam_fail = None):
 
+    # for spam, return every signal
     if spam:
         if not execution.success():
             return "failed"
         else:
             return "success"
 
+    # for spam_fail, return every failure
+    if spam_fail:
+        if not execution.success():
+            return "failed"
+
+    # otherwise, minimize signal:
+    # false if success and previous success
+    # false if failure and previous failure
+    # otherwise (that is, a change in status) notify current state
     if previous_executions and len(previous_executions) != 1:
         for execution in previous_executions:
             if execution.success():
@@ -334,6 +344,7 @@ class Executor():
         self.parsed_cron = None
         self.parsed_interval = None
         self.spam = None
+        self.spam_fail = None
         self.sudo_user = sudo_user
         self.fail_by_stderr = None
         self.fail_by_retcode = None
@@ -351,6 +362,7 @@ class Executor():
             task_params.PARSED_CRON     : self.parsed_cron,
             task_params.PARSED_INTERVAL : self.parsed_interval,
             task_params.SPAM            : self.spam,
+            task_params.SPAM_FAIL       : self.spam_fail,
             task_params.MAX_KEEP        : self.max_keep,
             task_params.FAIL_BY_STDERR  : self.fail_by_stderr,
             task_params.FAIL_BY_RETCODE : self.fail_by_retcode,
@@ -382,7 +394,10 @@ class Executor():
     def needs_notification(self, execution):
         _task = Task(execution.name, job_root_dir = execution.task_root)
         previous_executions = _task.find_previous_executions(execution.timestamp)
-        return needs_notification(execution, previous_executions, self.spam)
+        return needs_notification(execution,
+                                  previous_executions,
+                                  self.spam,
+                                  self.spam_fail)
 
     def run(self):
         '''execute task, ping notifiers, clean up old tasks'''

@@ -39,12 +39,13 @@ MAX_RUNS = False
 #
 
 # Default is system temp
-#SPEEDRACK_DIR = None
+#SPEEDRACK_DIR = "/your/favorite/path"
 
 # Individual storage overrides
 #JOB_ROOT_DIR = "./jobs"
 #JOB_STATE = "./sprack.shelve"
 #LOG_DIR = "./logs"
+#SUSPENDED_FILE = "./sprack.suspended"
 
 # log
 LOG_MAX_SIZE = 1024 * 1024 * 5

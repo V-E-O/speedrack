@@ -16,23 +16,35 @@
           <div class="row-fluid"> {# task header #}
 
             <div class="span7">
-              {%- if display_task.description is not none -%}
-              <p class="lead">{{ display_task.description }}</p>
-              {%- else -%}
-              <p class="lead"><em>No description available</em></p>
-              {%- endif -%}
+	      <p class="lead">
+		{%- if display_task.description is not none -%}
+		{{ display_task.description }}
+		{%- else -%}
+		<em>No description available</em>
+		{%- endif -%}
+	      </p>
 
-              {%- if just_launched or display_task.running %}
-              <p><a class="btn btn-primary disabled" href="#">Running now!</a></p>
-              {% elif display_task.conf_error %}
-              <p><a class="btn btn-danger disabled" href="#">Configuration error</a></p>
-              {% elif not display_task.active %}
-              <p><a class="btn btn-warning disabled" href="#">Task inactive</a></p>
-              {% elif g.shutdown %}
-              <p><a class="btn btn-warning disabled" href="#">System shutting down</a></p>
-              {% else %}
-              <p><a class="btn btn-primary" href="{{ url_for('run_task', task_name=display_task.name) }}">Run Now! &raquo;</a></p>
-              {% endif -%}
+	      <p>
+		{%- if just_launched or display_task.running %}
+		<a class="btn btn-primary disabled" href="#">Running now!</a>
+	        <a class="btn" href="{{ url_for('toggle_suspend_task', task_name=display_task.name) }}">Suspend</a>
+		{%- elif display_task.conf_error %}
+		<a class="btn btn-danger disabled" href="#">Configuration error</a>
+		{%- elif display_task.suspended %}
+		<div class="well">
+		  <strong>Task is suspended:</strong>
+		  <a class="btn btn-primary" href="{{ url_for('toggle_suspend_task', task_name=display_task.name) }}">Resume</a>
+		</div>
+		{%- elif not display_task.active %}
+		<a class="btn btn-warning disabled" href="#">Task inactive</a>
+		{%- elif g.shutdown %}
+		<a class="btn btn-warning disabled" href="#">System shutting down</a>
+		{%- else -%}
+	        <a class="btn btn-primary" href="{{ url_for('run_task', task_name=display_task.name) }}">Run Now! &raquo;</a>
+	        <a class="btn" href="{{ url_for('toggle_suspend_task', task_name=display_task.name) }}">Suspend</a>
+		{% endif -%}
+	      </p>
+
             </div>
 
             <div class="span5">

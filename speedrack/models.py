@@ -137,6 +137,7 @@ def needs_notification(execution,
     # false if success and previous success
     # false if failure and previous failure
     # otherwise (that is, a change in status) notify current state
+
     if previous_executions and len(previous_executions) != 1:
         for execution in previous_executions:
             if execution.success():
@@ -187,8 +188,9 @@ class Task():
         self.next_run_time = None
         self.num_runs = None
 
-    #@memoize
     def get_status(self):
+        if self.suspended:
+            return status.SUSPENDED
         if not self.active:
             return status.INACTIVE
         if self.running:
@@ -219,6 +221,12 @@ class Task():
 
     def has_executions(self):
         return self.count_executions() > 0
+
+    @property
+    def suspended(self):
+        if not app or not app._suspended:
+            return False
+        return self.name in app._suspended.tasks
 
     def _get_execution_dirs(self):
         '''
@@ -313,15 +321,6 @@ class Task():
         if not results or len(results) == 0:
             return None
         return results[0]
-
-    # APScheduler is a task scheduler, so we have to hack in the immediate-execution
-    # aspect. Immediate execution is handled here by using a scheduled execution
-    # with a time of "now".
-    # For intervals, this means descheduling the interval runner, executing now, then
-    # then rescheduling the interval runner.
-    # For cron tasks, this means running now and crossing our fingers.
-    def run_now(self):
-        pass
 
     def __str__(self):
         return "{name}:{status}:{path}:{executions}".format(
@@ -716,3 +715,46 @@ class Config():
         # we use json as a pretty printer because python's
         # pretty printer ain't pretty
         return str(json.dumps(self.parsed['tasks'], sort_keys=True, indent=2))
+
+
+class Suspended():
+    def __init__(self, file_name):
+        self.file_name = file_name
+        self.tasks = []
+        self._read()
+
+    def _read(self):
+        '''
+        returns a list of currently suspended tasks, creating the
+        file if it doesn't already exist
+        '''
+        tasks = []
+        if not os.path.exists(self.file_name):
+            with open(self.file_name, "w") as fout:
+                fout.write("")
+                fout.flush()
+        with open(self.file_name) as fin:
+            suspended = fin.readlines()
+        self.tasks = [x.strip() for x in suspended]
+
+    def _write(self):
+        try:
+            with open(self.file_name, "w") as fout:
+                fout.write("\n".join(self.tasks))
+                fout.flush()
+        except EnvironmentError:
+            app.logger.error("Could not write file: {0}".format(self.file_name))
+
+    def add(self, task_name):
+        if task_name in self.tasks:
+            return False
+        self.tasks.append(task_name)
+        self._write()
+        return True
+
+    def remove(self, task_name):
+        if task_name not in self.tasks:
+            return False
+        self.tasks.remove(task_name)
+        self._write()
+        return True

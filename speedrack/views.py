@@ -115,16 +115,22 @@ def run_task(task_name = None):
         flash("Couldn't find your job. How did we get here?", "error")
         return redirect(url_for('show_tasks'))
 
-    flash("Submitted [%s] for immediate execution." % task_name, "info")
+    flash("Submitted [{task}] for immediate execution.".format(task=task_name), "info")
     return redirect(url_for('show_tasks', task_name = task_name, just_launched = True))
+
+def _reload_config():
+    app._shutdown = True
+    app._sched = aps.update(
+        app._sched,
+        app.config.get('CONFIG_YAML', None),
+        app.config.get('JOB_STATE', None),
+        app._suspended
+    )
+    app._shutdown = False
 
 @app.route("/config/reload")
 def reload_config():
-    app._shutdown = True
-    app._sched = aps.update(app._sched,
-                            app.config.get('CONFIG_YAML', None),
-                            app.config.get('JOB_STATE', None))
-    app._shutdown = False
+    _reload_config()
     _flash_msg = "Reloaded config file: {conf}".format(conf=app.config.get('CONFIG_YAML', None))
     flash(_flash_msg, "success")
     return redirect(url_for('show_debug'))
@@ -136,6 +142,30 @@ def clear_config():
     flash("Scheduler cleared of running tasks; consider reloading config now.")
     return redirect(url_for('show_debug'))
 
+@app.route("/tasks/<task_name>/toggle_suspend")
+def toggle_suspend_task(task_name = None):
+    if task_name is None:
+        flash("How did we end up here? It's a mystery.", "warning")
+        return redirect(url_for('show_tasks'))
+
+    task_name = task_name.lower()
+
+    added_suspend = False
+    if task_name in app._suspended.tasks:
+        app._suspended.remove(task_name)
+    else:
+        app._suspended.add(task_name)
+        added_suspend = True
+
+    _reload_config()
+
+    if added_suspend:
+        flash("Task [{task}] suspended. Also reloaded config file.".format(task=task_name), "success")
+    else:
+        flash("Task [{task}] resumed execution. Also reloaded config file".format(task=task_name), "success")
+    return redirect(url_for("show_tasks"))
+
+
 @app.route("/debug")
 def show_debug():
     yaml_config = models.Config(app.config['CONFIG_YAML'])
@@ -143,7 +173,8 @@ def show_debug():
     if ('scheduled' in request.args
         or 'settings' in request.args
         or 'raw' in request.args
-        or 'parsed' in request.args):
+        or 'parsed' in request.args
+        or 'suspended' in request.args):
 
         if 'scheduled' in request.args:
             display_data = 'scheduled'
@@ -153,12 +184,15 @@ def show_debug():
             display_data = 'raw'
         elif 'parsed' in request.args:
             display_data = 'parsed'
+        elif 'suspended' in request.args:
+            display_data = 'suspended'
 
     jobs = app._sched.get_jobs()
     return render_template("debug.html.jinja",
                            jobs=jobs,
                            yaml_config=yaml_config,
-                           display_data=display_data)
+                           display_data=display_data,
+                           suspended=app._suspended)
 
 @app.route("/help")
 def show_help():

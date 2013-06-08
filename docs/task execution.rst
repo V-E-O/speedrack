@@ -20,7 +20,7 @@ This is also configurable per task. The administrator is responsible for getting
 Sudo control
 ------------
 
-Sudo execution requires the hosting user to have password-free sudo access to the given user. Commands will end up being equivalent to:
+Sudo execution requires the hosting user to have password-free sudo access to the given user. Commands will end up being roughly equivalent to:
 
     $ sudo -u task_sudo_user task_command
 

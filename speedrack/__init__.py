@@ -1,4 +1,4 @@
-version_info = (0, 4, 1)
+version_info = (0, 5, 0)
 version = '.'.join(str(n) for n in version_info[:3])
 release = version + ''.join(str(n) for n in version_info[3:])
 
@@ -14,9 +14,11 @@ app.secret_key = "not_so_secret_lololol"
 # global application controls
 app._shutdown = False
 app._sched = None
+app._suspended = None
 
 from datetime import datetime
 app.config['datetime_launch'] = datetime.now()
+app.config['version'] = version
 
 import signal
 def sigint_handler(signal, frame):
@@ -51,6 +53,7 @@ def config_paths():
     set_default_path(con.LOG_DIR, "logs")
     set_default_path(con.JOB_ROOT_DIR, "jobs")
     set_default_path(con.JOB_STATE, "speedrack.state")
+    set_default_path(con.SUSPENDED_FILE, "speedrack.suspended")
 
 
 def start_logger():
@@ -100,6 +103,7 @@ def launch_services():
 
     config_paths()
     start_logger()
+    app._suspended = models.Suspended(app.config[con.SUSPENDED_FILE])
     filer.assert_no_tilde(app.config[con.JOB_ROOT_DIR])
     if not os.path.exists(app.config[con.JOB_ROOT_DIR]):
         os.makedirs(app.config[con.JOB_ROOT_DIR])
@@ -132,6 +136,9 @@ from speedrack import timing
 from speedrack import aps
 
 def start_scheduler():
-    app._sched = aps.init(app.config.get(con.CONFIG_YAML, None),
-                          app.config.get(con.JOB_STATE, None))
+    app._sched = aps.init(
+        app.config.get(con.CONFIG_YAML, None),
+        app._suspended,
+        app.config.get(con.JOB_STATE, None),
+    )
     app.logger.info("Speedrack started in '%s' environment." % ("test"))

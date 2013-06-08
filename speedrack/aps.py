@@ -24,7 +24,11 @@ _FHANDLE = 'file'
 apscheduler.scheduler.logger = app.logger
 logger = app.logger # expose without referring to app
 
-def init(yaml_file, job_state_file = None):
+# do not refer to app beyond this point
+
+def init(yaml_file,
+         suspended,
+         job_state_file = None):
     """Set up apscheduler, recover existing file store if there is one,
     otherwise kick off a new one with existing config settings"""
 
@@ -35,7 +39,7 @@ def init(yaml_file, job_state_file = None):
     recovered_job_count = len(sched.get_jobs())
     if recovered_job_count == 0:
         logger.info("Recovered NO jobs from store, creating new job store and seeding with config-generated params.")
-        sched = update(sched, yaml_file, job_state_file)
+        sched = update(sched, yaml_file, job_state_file, suspended)
     else:
         logger.info("Recovered %d jobs from store." % recovered_job_count)
 
@@ -60,7 +64,7 @@ def new_scheduler():
     sched = Scheduler(apsched_config)
     return sched
 
-def update(sched, yaml_file, job_state_file):
+def update(sched, yaml_file, job_state_file, suspended):
     """Clears existing persistent job store, replaces with new one
     created from current config file contents."""
 
@@ -78,7 +82,7 @@ def update(sched, yaml_file, job_state_file):
     sched = new_scheduler()
 
     yaml_config = models.Config(yaml_file)
-    load_tasks(sched, yaml_config)
+    load_tasks(sched, yaml_config, suspended)
     sched.add_jobstore(ShelveJobStore(job_state_file), _FHANDLE)
     sched.start()
     return sched
@@ -87,8 +91,9 @@ def clear(sched, job_state_file):
     '''detaching from existing jobstore isn't sufficient. must
     clear and rebuild'''
 
-    # Above is not literally true. It would be possible to walk each
-    # task and diff it agains the reloaded one.
+    # Above is not literally true. It is be possible to walk each
+    # task and diff it agains the reloaded one. This proved to be
+    # easy to get wrong, particularly during renames.
 
     logger.info("Clear requested, removing filestore.")
     try:
@@ -258,7 +263,7 @@ def schedule_params(sched, params):
         raise Exception, "Shouldn't ever be here."
 
 
-def load_tasks(sched, config):
+def load_tasks(sched, config, suspended):
     """Given a list of tasks, update the scheduler."""
 
     logger.debug("NUM TASKS: %d" % len(sched.get_jobs()))
@@ -269,6 +274,9 @@ def load_tasks(sched, config):
 
     for config_block in config.parsed['tasks']:
         params = new_params(config_block)
+        if suspended.tasks and params[task_params.NAME] in suspended.tasks:
+            logger.info("Skipping suspended task: {task}".format(task=params[task_params.NAME]))
+            continue
         schedule_params(sched, params)
 
 def shutdown(sched):

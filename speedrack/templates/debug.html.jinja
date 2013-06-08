@@ -30,6 +30,7 @@
     {{ tab("settings", "application settings ") }}
     {{ tab("raw", "raw yaml file ") }}
     {{ tab("parsed", "parsed configuration ") }}
+    {{ tab("suspended", "suspended tasks") }}
   </ul>
 
   {% if display_data == "scheduled" %}
@@ -63,6 +64,9 @@
 
   {% elif display_data == "parsed" %}
   <pre>{{ yaml_config }}</pre>
+
+  {% elif display_data == "suspended" %}
+  <pre>{{ suspended.tasks }}</pre>
 
   {% endif %}
 

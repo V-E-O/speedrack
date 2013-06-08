@@ -6,8 +6,9 @@ EXEC_ERROR = "execution error"
 CONF_ERROR = "conf error"
 RUNNING    = "running"
 INACTIVE   = "inactive"
+SUSPENDED  = "suspended"
 
-_all_status = [SUCCESS, FAILURE, NEVER_RUN, EXEC_ERROR, CONF_ERROR, RUNNING, INACTIVE]
+_all_status = [SUCCESS, FAILURE, NEVER_RUN, EXEC_ERROR, CONF_ERROR, RUNNING, INACTIVE, SUSPENDED]
 
 # text descriptions
 _description = {
@@ -18,6 +19,7 @@ _description = {
     CONF_ERROR : "task is not configured correctly; cannot execute",
     RUNNING    : "task was running within the last second",
     INACTIVE   : "results have been found in job directory, but task is not scheduled for execution",
+    SUSPENDED  : "task execution has been paused",
 }
 
 # state -> severity
@@ -30,6 +32,7 @@ _severity = {
     EXEC_ERROR : "warning",
     RUNNING    : "info",
     INACTIVE   : "inverse",
+    SUSPENDED  : "default",
 }
 
 def get_all_status():

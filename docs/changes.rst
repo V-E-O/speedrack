@@ -2,6 +2,12 @@
 Changes
 =======
 
+0.5
+  added in-app manual suspension of tasks, more convenient than commenting out task in yaml and reloading
+
+0.4.1
+  bugfix for spam_fail
+
 0.4
   added spam_fail setting, for hammering failure messages
 

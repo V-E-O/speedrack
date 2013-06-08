@@ -23,27 +23,3 @@ class TestRoutes(object):
             for (expected, route) in tests:
                 yield self.check_route, expected, route
 
-
-# import mock
-# from test.helpers import *
-# from speedrack.models import TaskList, Task
-# class TestTaskViews(object):
-#     client = app.test_client()
-
-    # def setup(self):
-    #     self.gene = Factory(Gene)
-
-    # def test_task_list(self):
-        # with app.test_request_context():
-        #     response = self.client.get(url_for("show_tasks"))
-        #     print response
-        #     raise
-
-    # def test_show_gene_with_locus(self):
-    #     with mock.patch.object(Gene, 'by_id_or_locus',
-    #                            classmethod(lambda *x:self.gene)):
-    #         with app.test_request_context():
-    #             response = self.client.get(url_for("show_gene",
-    #                                          gene_id=self.gene.id))
-
-    #             assert_in(self.gene.locus, response.data)

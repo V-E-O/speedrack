@@ -153,6 +153,7 @@ def executor_func(params):
     # optional
     email_recipients = params.get(task_params.EMAIL_RECIPIENTS, [])
     spam             = params.get(task_params.SPAM, None)
+    spam_fail        = params.get(task_params.SPAM_FAIL, None)
     description      = params.get(task_params.DESCRIPTION, None)
     max_keep         = params.get(task_params.MAX_KEEP, None)
     fail_by_stderr   = params.get(task_params.FAIL_BY_STDERR, None)
@@ -167,6 +168,8 @@ def executor_func(params):
         ex.max_keep = int(max_keep)
     if spam:
         ex.spam = spam
+    if spam_fail:
+        ex.spam_fail = spam_fail
     ex.fail_by_stderr = fail_by_stderr
     ex.fail_by_retcode = fail_by_retcode
     ex.parsed_interval = parsed_interval
@@ -206,6 +209,7 @@ def new_params(config_block):
         email_recipients = []
 
     spam = config_block.get(task_params.SPAM, None)
+    spam_fail = config_block.get(task_params.SPAM_FAIL, None)
     sudo_user = config_block.get(task_params.SUDO_USER, None)
 
     unparsed_interval = config_block.get(task_params.TASK_INTERVAL, None)
@@ -226,6 +230,7 @@ def new_params(config_block):
         task_params.FAIL_BY_RETCODE: fail_by_retcode,
         task_params.CONFIG: config_block,
         task_params.SPAM: spam,
+        task_params.SPAM_FAIL: spam_fail,
         task_params.SUDO_USER: sudo_user,
     }
 

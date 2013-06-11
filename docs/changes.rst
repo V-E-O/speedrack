@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.5.1
+  bugfix for sudo controls
+
 0.5
   added in-app manual suspension of tasks, more convenient than commenting out task in yaml and reloading
 

@@ -416,10 +416,16 @@ class Executor():
             execution.start_running()
             with open(execution.std_out, "w") as fout, \
                 open(execution.std_err, "w") as ferr:
-                cmd = self.command
+                status_code = 0
                 if self.sudo_user:
-                    cmd = "sudo -u {0} {1}".format(self.sudo_user, self.command)
-                status_code = subprocess.call(cmd, stdout=fout, stderr=ferr, shell=True)
+                    status_code = subprocess.call(
+                        ["sudo", "-u", self.sudo_user, "-i", self.command],
+                        stdout=fout,
+                        stderr=ferr,
+                        shell=False
+                    )
+                else:
+                    status_code = subprocess.call(self.command, stdout=fout, stderr=ferr, shell=True)
             execution.write_status_code(status_code)
         except Exception as inst:
             msg = "Exception running %s:\n%s\n%s" % (str(self.name), inst, traceback.format_exc())

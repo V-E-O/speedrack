@@ -15,7 +15,7 @@ tests_require = [
 ]
 
 install_requires = [
-    'APScheduler==2.0.3',
+    'APScheduler==2.1.0',
     'Flask==0.8',
     'PyYAML==3.10',
 ]

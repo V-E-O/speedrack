@@ -1,4 +1,4 @@
-APScheduler==2.0.3
+APScheduler==2.1.0
 Flask==0.8
 Jinja2==2.6
 nose==1.1.2

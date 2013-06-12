@@ -2,27 +2,25 @@
 
 from setuptools import setup, find_packages
 
-from speedrack import version
-
 with open('README.rst') as f:
     readme = f.read()
 
 tests_require = [
     'nose',
-    'virtualenv>=1.7',
-    'scripttest>=1.1.1',
+    'virtualenv >= 1.7',
+    'scripttest >= 1.1.1',
     'mock',
 ]
 
 install_requires = [
-    'APScheduler==2.1.0',
-    'Flask==0.8',
-    'PyYAML==3.10',
+    'APScheduler == 2.1.0',
+    'Flask == 0.9',
+    'PyYAML == 3.10',
 ]
 
 data = dict(
     name    = 'speedrack',
-    version = version,
+    version = '0.5.2',
 
     author       = 'Clint Howarth',
     author_email = 'clint.howarth@gmail.com',

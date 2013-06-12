@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.5.2
+  bugfix for APScheduler stale dependency and overambitious setup
+
 0.5.1
   bugfix for sudo controls
 

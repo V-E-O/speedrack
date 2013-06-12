@@ -15,4 +15,5 @@ Contents:
    task execution
    about
    changes
+   contributors
    todo

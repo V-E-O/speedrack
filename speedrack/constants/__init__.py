@@ -28,6 +28,8 @@ PORT = "PORT"
 FAIL_BY_STDERR = "FAIL_BY_STDERR"
 FAIL_BY_RETCODE = "FAIL_BY_RETCODE"
 
+SCRIPT_NAME = "SCRIPT_NAME"
+
 # params
 import task_params
 

@@ -32,6 +32,12 @@ Application settings
 
 ``speedrack_settings.py`` contains *application behavior*: your application name, mail server settings, and so on. You won't need them all. If you're not familiar with python, you don't need to learn it to administer this application — just stick with the simple declarative syntax.
 
+Sub-path support
+----------------
+
+If Speedrack is running at a non-root location on a domain (e.g., http://www.example.com/speedrack/), then you'll need to let Speedrack know to modify its URLs appropriately.  In your configuration file, set the variable ``SCRIPT_NAME`` to whatever path prefix points to the Speedrack index (in this case, ``SCRIPT_NAME = '/speedrack'``).
+
+
 Task definitions and behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.6.0
+  added SCRIPT_NAME configuration variable for supporting sub-path server roots
+
 0.5.2
   bugfix for APScheduler stale dependency and overambitious setup
 

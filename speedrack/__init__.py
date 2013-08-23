@@ -127,6 +127,23 @@ def set_task_file(task_file):
     """overrides demo task file"""
     app.config[con.CONFIG_YAML] = task_file
 
+def configure_script_name(app):
+    """
+    configure the WSGI environment to enable running speedrack from a sub-path
+    """
+    if con.SCRIPT_NAME in app.config:
+        # from flask/testsuite/basic.py
+        class PrefixPathMiddleware(object):
+            def __init__(self, app, prefix):
+                self.app = app
+                self.prefix = prefix
+            def __call__(self, environ, start_response):
+                environ['SCRIPT_NAME'] = self.prefix
+                return self.app(environ, start_response)
+
+        app.wsgi_app = PrefixPathMiddleware(app.wsgi_app, app.config[con.SCRIPT_NAME])
+
+
 import speedrack.context_processors
 import speedrack.filters
 import speedrack.views

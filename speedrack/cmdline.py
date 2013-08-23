@@ -84,6 +84,8 @@ def run(debug=False, port=8118, settings_file="", yaml_file=""):
 
     speedrack.app.config.update({'PORT': port})
 
+    speedrack.configure_script_name(speedrack.app)
+
     if yaml_file:
         task_file = os.path.join(os.getcwd(), yaml_file)
         if not os.path.isfile(task_file):

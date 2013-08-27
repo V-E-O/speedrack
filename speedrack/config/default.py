@@ -13,6 +13,10 @@ APP_NAME="speedrack"
 # Number of executions to display 
 EXECUTION_DISPLAY = 20
 
+# subpath in hosted URL, if on shared host or behind proxy, set this to the subpath
+# you'd like the application to resolve to
+#SCRIPT_NAME="/speedrack"
+
 #
 # task execution
 #

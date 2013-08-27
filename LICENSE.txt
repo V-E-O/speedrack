@@ -2,7 +2,7 @@ Speedrack is licensed under a three clause BSD License. For more information reg
 - http://www.opensource.org/licenses/BSD-3-Clause
 - http://en.wikipedia.org/wiki/BSD_licenses#3-clause_license_.28.22New_BSD_License.22_or_.22Modified_BSD_License.22.29
 
-Copyright (c) 2012 by Clint Howarth and contributors. See AUTHORS for more details.
+Copyright (c) 2013 by Clint Howarth and contributors. See AUTHORS for more details.
 
 Some rights reserved.
 

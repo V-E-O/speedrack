@@ -12,7 +12,8 @@ try:
     from gevent.wsgi import WSGIServer
     with_gevent = True
 except ImportError:
-    sys.stdout.write("Couldn't find gevent, using dev server.\n")
+    pass
+    #sys.stdout.write("Couldn't find gevent, using dev server.\n")
 
 def _get_default_config():
     SPEEDRACK_ROOT = os.path.abspath(os.path.dirname(__file__))

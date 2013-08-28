@@ -35,8 +35,9 @@ Application settings
 Sub-path support
 ----------------
 
-If Speedrack is running at a non-root location on a domain (e.g., http://www.example.com/speedrack/), then you'll need to let Speedrack know to modify its URLs appropriately.  In your configuration file, set the variable ``SCRIPT_NAME`` to whatever path prefix points to the Speedrack index (in this case, ``SCRIPT_NAME = '/speedrack'``).
+If Speedrack is running at a non-root location on a domain (e.g., http://www.example.com/speedrack/ resolves to the application root view), then you'll need to let Speedrack know to modify the URLs it makes appropriately. In your configuration file, set the variable ``SCRIPT_NAME`` to whatever path prefix points to the Speedrack index (in this case, ``SCRIPT_NAME = '/speedrack'``).
 
+.. note:: This setting alone does not actually change how Speedrack **parses** requests. Rather, this tells Speedrack that when it **generates** a URL, it should prefix it with the provided string. This means that when the client clicks a link or requests a stylesheet in the original response, the new request is pointed at the right location.
 
 Task definitions and behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

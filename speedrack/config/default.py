@@ -13,8 +13,8 @@ APP_NAME="speedrack"
 # Number of executions to display 
 EXECUTION_DISPLAY = 20
 
-# subpath in hosted URL, if on shared host or behind proxy, set this to the subpath
-# you'd like the application to resolve to
+# Subpath in shared-host. Leave commented out if not running behind
+# shared-proxy. See docs/setup.rst for more details.
 #SCRIPT_NAME="/speedrack"
 
 #

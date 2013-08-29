@@ -20,7 +20,7 @@ install_requires = [
 
 data = dict(
     name    = 'speedrack',
-    version = '0.6.0',
+    version = '0.6.1',
 
     author       = 'Clint Howarth',
     author_email = 'clint.howarth@gmail.com',

@@ -39,6 +39,8 @@ If Speedrack is running at a non-root location on a domain (e.g., http://www.exa
 
 .. note:: This setting alone does not actually change how Speedrack **parses** requests. Rather, this tells Speedrack that when it **generates** a URL, it should prefix it with the provided string. This means that when the client clicks a link or requests a stylesheet in the original response, the new request is pointed at the right location.
 
+Speedrack also needs to be told where the URLs it generates in the emails it sends should point. The variable ``EMAIL_URL_PREFIX`` should be set to the external URL of the application, and then when a link is generated for email, the relative path that's generated will be joined with this base for a complete URL.
+
 
 Task definitions and behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

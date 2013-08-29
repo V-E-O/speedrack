@@ -12,6 +12,7 @@ APP_NAME="speedrack"
 
 # uncomment for sub-path support (see Setup documentation for more information)
 #SCRIPT_NAME='/speedrack'
+#EMAIL_URL_PREFIX=http://example.com/speedrack
 
 # Number of executions to display 
 EXECUTION_DISPLAY = 20

@@ -495,14 +495,26 @@ class Executor():
             # not my favorite flaskism
             with app.test_request_context():
                 from flask import url_for
+                route = url_for('show_tasks',
+                                task_name = execution.name,
+                                timestamp = execution.timestamp)
+
+            if con.EMAIL_URL_PREFIX in app.config:
+                task_link_args = {
+                    'prefix': app.config.get(con.EMAIL_URL_PREFIX, None),
+                    'route': route,
+                }
+
+                task_link = "{prefix}{route}".format(**task_link_args)
+
+            else:
                 task_link_args = {
                     'server': app.config.get(con.URL_ROOT, None),
                     'port': app.config.get(con.PORT, None),
-                    'route': url_for('show_tasks',
-                                     task_name = execution.name,
-                                     timestamp = execution.timestamp),
+                    'route': route,
                 }
-                task_link = "http://{server}:{port}/{route}".format(**task_link_args)
+
+                task_link = "http://{server}:{port}{route}".format(**task_link_args)
 
         message = notification.create_mail(
             app_name = app.config.get(con.APP_NAME, "Speedrack"),

@@ -1,4 +1,6 @@
-# Application interface to APScheduler
+#
+# Speedrack management of APScheduler
+#
 from datetime import datetime, date, timedelta
 import os
 import re
@@ -29,8 +31,10 @@ logger = app.logger # expose without referring to app
 def init(yaml_file,
          suspended,
          job_state_file = None):
-    """Set up apscheduler, recover existing file store if there is one,
-    otherwise kick off a new one with existing config settings"""
+    """
+    Set up apscheduler, recover existing file store if there is one,
+    otherwise kick off a new one with existing config settings
+    """
 
     sched = new_scheduler()
     if job_state_file:
@@ -65,8 +69,10 @@ def new_scheduler():
     return sched
 
 def update(sched, yaml_file, job_state_file, suspended):
-    """Clears existing persistent job store, replaces with new one
-    created from current config file contents."""
+    """
+    Clears existing persistent job store, replaces with new one created
+    from current config file contents.
+    """
 
     # the file-based scheduler store needs to be removed completely
     # to update any of its shelved settings:
@@ -88,11 +94,13 @@ def update(sched, yaml_file, job_state_file, suspended):
     return sched
 
 def clear(sched, job_state_file):
-    '''detaching from existing jobstore isn't sufficient. must
-    clear and rebuild'''
+    '''
+    Detaching from existing jobstore isn't sufficient. Must clear and
+    rebuild.
+    '''
 
     # Above is not literally true. It is be possible to walk each
-    # task and diff it agains the reloaded one. This proved to be
+    # task and diff it against the reloaded one. This proved to be
     # easy to get wrong, particularly during renames.
 
     logger.info("Clear requested, removing filestore.")
@@ -109,10 +117,12 @@ def clear(sched, job_state_file):
         os.unlink(job_state_file + ".db")
 
 def run_task(sched, task_name):
-    '''Executes a given task immediately. In APScheduler, this is
+    '''
+    Executes a given task immediately. In APScheduler, this is
     handled by adding a task in the very-near (1s) future. An
     interval-driven task has its interval reset with this execution. A
-    cron-driven task does not. Returns True if successful.'''
+    cron-driven task does not. Returns True if successful.
+    '''
 
     jobs = sched.get_jobs()
 
